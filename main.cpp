@@ -35,7 +35,7 @@ int main(int argc, const char * argv[]) {
     cout << "is_help_command: " << is_help_command << endl;
     
     if(is_network_command){
-        ret_msg = syncWrapper->sync_with_remote("This should be an instance of the CommandModel, not a string!");
+        ret_msg = syncWrapper->sync_with_remote("INSERT CommandModel HERE!!! Not a string!");
         IOHandler::output_title(ret_msg);
     }
 
