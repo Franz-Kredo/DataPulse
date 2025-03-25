@@ -33,8 +33,9 @@ debug: clean
 	gdb ./debug.out
 
 # Run the executable
+# $(CXX) $(CXXFLAGS) $(INCLUDES) -o $(TARGET) $(OBJFILES) $(LIBS)
 run: $(TARGET)
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $(TARGET) $(OBJFILES) $(LIBS)
+	./$(TARGET) 192.168.42.125 franz /home/franz/pa5 /home/franz/github_repos/DataPulse/SyncTester
 	./$(TARGET) 
 
 

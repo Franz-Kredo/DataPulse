@@ -57,7 +57,10 @@ bool IOHandler::validate_unix_filepath(string &filepath){
 
 //----- Command Line Argument Handler -----//
 bool IOHandler::is_valid(int argc, const char * argv[]){
-    return false;
+    bool valid_net_command = IOHandler::is_network_command(argc, argv);
+    bool valid_help_command = IOHandler::is_help_command(argc, argv);
+
+    return (valid_net_command || valid_help_command);
 }  
 
 
