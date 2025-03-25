@@ -38,7 +38,7 @@ run: $(TARGET)
 	./$(TARGET) 
 
 
-# Run the executable
+# Run tests for the is_network_command method
 net:clean $(TARGET)
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $(TARGET) $(OBJFILES) $(LIBS)
 	@echo "\n\n\n============================================================="
@@ -70,6 +70,33 @@ net:clean $(TARGET)
 	./$(TARGET) 192.168.42.125 -m franz /home/franz/pa5 /home/franz/github_repos/DataPulse/SyncTester /Users/franzisak/.ssh/proxmox-home /Users/franzisak/.ssh/proxmox-home /Users/franzisak/.ssh/proxmox-home /Users/franzisak/.ssh/proxmox-home
  
 
+# Run tests for the is_help_command method
+help:clean $(TARGET)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $(TARGET) $(OBJFILES) $(LIBS)
+	@echo "\n\n\n============================================================="
+	@echo "============== Running Valid Help Command Tests ==============="
+	@echo "============================================================="
+	@echo "\n\n====== Running Help Test 1 ======"
+	./$(TARGET) -h
+	@echo "\n\n====== Running Valid Help Test 2 (long flag, filled with spaces 1) ======"
+	./$(TARGET) - h
+	@echo "\n\n====== Running Valid Help Test 3 (long flag, filled with spaces 2) ======"
+	./$(TARGET) -h 
+	@echo "\n\n====== Running Valid Help Test 4 (long flag, filled with spaces 3) ======"
+	./$(TARGET)  -h
+	@echo "\n\n====== Running Valid Help Test 5 (long flag, filled with spaces 4) ======"
+	./$(TARGET)        -h
+	@echo "\n\n\n==============================================================="
+	@echo "============== Running Invalid Net Command Tests =============="
+	@echo "==============================================================="
+	@echo "\n\n====== Running Invalid Help Test 6 (Too many letters 1) ======"
+	./$(TARGET) -hx
+	@echo "\n\n====== Running Invalid Help Test 7 (Too many letters) ======"
+	./$(TARGET) x-h
+	@echo "\n\n====== Running Invalid Help Test 8 (Invalid flag) ======"
+	./$(TARGET) -m
+	
+
 
 # "short" target: incremental build that compiles only changed source files
 short: $(OBJFILES)
@@ -79,7 +106,7 @@ short: $(OBJFILES)
 
 # Fast: run the executable without rebuilding
 fast:
-	./$(TARGET)
+	./$(TARGET) 192.168.42.125 franz /home/franz/pa5 /home/franz/github_repos/DataPulse/SyncTester
 
 # Deb: launch debugger on the debug build
 deb:

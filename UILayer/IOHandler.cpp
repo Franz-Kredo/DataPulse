@@ -87,11 +87,7 @@ bool IOHandler::is_network_command(int argc, const char * argv[]){
     if (string(argv[2]) == "-m"){
         flag = argv[2];
         offset = 1;
-        // cout << endl << "WE BE FLAGGING ME MAN!" << endl;
     } 
-    // else {
-        //     cout << endl << "Nah we aint flagging" << endl;
-        // }
         
     host = argv[1]; // No offset since it's the first element
     username = argv[2+offset];
@@ -134,7 +130,19 @@ bool IOHandler::is_network_command(int argc, const char * argv[]){
 
 
 bool IOHandler::is_help_command(int argc, const char * argv[]){
-    return false;
+    int args_amount = 2;
+    string flag;
+
+    // Invalid amount of arguments
+    if(argc != args_amount) return false;
+
+    flag = argv[1];
+
+    // If the second parameter is not '-h', then it's not really a help command is it?
+    if(flag != "-h") return false;
+
+
+    return true;
 }
 
 

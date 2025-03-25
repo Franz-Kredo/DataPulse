@@ -15,13 +15,18 @@ int main(int argc, const char * argv[]) {
 
 
 
-    bool is_valid = IOHandler::is_network_command(argc, argv);
+    bool is_network_command = IOHandler::is_network_command(argc, argv);
+    bool is_help_command = IOHandler::is_help_command(argc, argv);
 
-    if(is_valid){
-        cout << "Is network command!" << endl;
-    } else {
-        cout << "Is not network command foe shoe!" << endl;
-    }
+    cout << "is_network_command: " << is_network_command << endl;
+    cout << "is_help_command: " << is_help_command << endl;
+    
+
+    // if(is_help_command){
+    //     cout << "Is a help command!" << endl;
+    // } else {
+    //     cout << "Is not a help command foe shoe!" << endl;
+    // }
 
 
     return 0;
