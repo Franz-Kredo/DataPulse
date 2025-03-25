@@ -1,5 +1,7 @@
 #include "NetworkLogic.h"
+#include <string>
 #include <sys/stat.h>
+#include <termios.h>
 
 
 NetworkLogic::NetworkLogic(CommandModel *commandModel)
@@ -14,11 +16,14 @@ NetworkLogic::NetworkLogic(CommandModel *commandModel)
 
     if (ssh_connect(sshSession) != SSH_OK)
         throw std::runtime_error("SSH connection failed: " + std::string(ssh_get_error(sshSession)));
-
-    //if (ssh_userauth_publickey_auto(sshSession, nullptr, passphrase.c_str()) != SSH_AUTH_SUCCESS)
-    //    throw std::runtime_error("SSH authentication failed: " + std::string(ssh_get_error(sshSession)));
-    if (ssh_userauth_publickey_auto(sshSession, nullptr, nullptr) != SSH_AUTH_SUCCESS)
-        throw std::runtime_error("SSH authentication failed: " + std::string(ssh_get_error(sshSession)));
+    if (ssh_userauth_publickey_auto(sshSession, nullptr, nullptr) != SSH_AUTH_SUCCESS) {
+        // Maybe add logic to check if the key is encrypted to store in model?
+        // That way we only prompt for password if the body of the key is encrypted?
+        std::string passphrase = this->prompt_hidden("Enter passphrase for key '" + commandModel->get_priv_key_path() + "':");
+        if (ssh_userauth_publickey_auto(sshSession, nullptr, passphrase.c_str()) != SSH_AUTH_SUCCESS) {
+            throw std::runtime_error("SSH authentication failed" + std::string(ssh_get_error(sshSession)));
+    }
+}
 
     this->sftpSession = new SftpSessionModel(sshSession);
 }
@@ -43,4 +48,23 @@ void NetworkLogic::list_remote_directory(CommandModel *commandModel) {
         sftp_attributes_free(attrs);
     }
     sftp_closedir(dir);
+}
+
+// Built from stackoverflow post, not sure where to put this, it is storing a password after all.
+string NetworkLogic::prompt_hidden(string const &prompt) {
+    cout << prompt;
+    termios oldt, newt;
+    string password;
+    // Save the current state of the terminal
+    tcgetattr(STDIN_FILENO, &oldt);
+    // The new state is equal to the old state
+    newt = oldt;
+    // Disable Echo and apply settings to terminal
+    newt.c_lflag &= ~ECHO;
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+    getline(cin, password);
+    // Restore the backed of state of the terminal
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+    cout << endl;
+    return password;
 }

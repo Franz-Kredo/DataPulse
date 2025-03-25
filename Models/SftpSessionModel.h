@@ -21,8 +21,8 @@ public:
     	sftp_session get() const { return sftp_sesh; }
 
 private:
-	sftp_session sftp_sesh;
 	ssh_session ssh_sesh;
+	sftp_session sftp_sesh;
 };
 
 #endif // SFTP_SESSION_MODEL 

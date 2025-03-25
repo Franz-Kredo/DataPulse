@@ -22,9 +22,9 @@ class CommandModel {
 	bool merge;
 
 public:
-	CommandModel();
+	CommandModel() = default;
 
-    	~CommandModel();
+    	~CommandModel() = default;
 
 	string get_host() const {return this->host;}	
 	string get_username() const {return this->username;}	

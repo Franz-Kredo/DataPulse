@@ -14,7 +14,8 @@ class NetworkLogic{
     NetworkLogic(CommandModel *commandModel);
 
     void list_remote_directory(CommandModel *commandModel);
-    //private:
+    private:
+    string prompt_hidden(string const &prompt);
 
 };
 
