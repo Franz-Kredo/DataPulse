@@ -2,9 +2,9 @@
 #define NETWORKLOGIC_H
 
 #include "../Models/SftpSessionModel.h"
+#include "../Models/CommandModel.h"
 #include <iostream>
 #include <string>
-class CommandModel{}; // replace with CommandModel include once ready
 using std::string;
 
 

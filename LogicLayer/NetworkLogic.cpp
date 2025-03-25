@@ -1,4 +1,5 @@
 #include "NetworkLogic.h"
+#include <sys/stat.h>
 
 
 NetworkLogic::NetworkLogic(CommandModel *commandModel)
@@ -7,9 +8,9 @@ NetworkLogic::NetworkLogic(CommandModel *commandModel)
     if (!sshSession) throw std::runtime_error("Failed to create SSH session");
 
     // Migh need to be cast to c_str()
-    ssh_options_set(sshSession, SSH_OPTIONS_HOST, commandModel->host);
-    ssh_options_set(sshSession, SSH_OPTIONS_USER, commandModel->user);
-    ssh_options_set(sshSession, SSH_OPTIONS_ADD_IDENTITY, commandModel->key_path);
+    ssh_options_set(sshSession, SSH_OPTIONS_HOST, commandModel->get_host().c_str());
+    ssh_options_set(sshSession, SSH_OPTIONS_USER, commandModel->get_username().c_str());
+    ssh_options_set(sshSession, SSH_OPTIONS_ADD_IDENTITY, commandModel->get_priv_key_path().c_str());
 
     if (ssh_connect(sshSession) != SSH_OK)
         throw std::runtime_error("SSH connection failed: " + std::string(ssh_get_error(sshSession)));
@@ -25,8 +26,8 @@ NetworkLogic::NetworkLogic(CommandModel *commandModel)
 
 // Testing func
 void NetworkLogic::list_remote_directory(CommandModel *commandModel) {
-    sftp_dir dir = sftp_opendir(this->sftpSession->get(), commandModel->remote_path);
-    if (!dir) throw std::runtime_error("Unable to open remote directory: " + commandModel->remote_path);
+    sftp_dir dir = sftp_opendir(this->sftpSession->get(), commandModel->get_remote_path().c_str());
+    if (!dir) throw std::runtime_error("Unable to open remote directory: " + commandModel->get_remote_path());
 
     sftp_attributes attrs;
     while ((attrs = sftp_readdir(this->sftpSession->get(), dir)) != nullptr) {
