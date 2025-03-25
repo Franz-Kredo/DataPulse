@@ -26,17 +26,127 @@ int IOHandler::title_max_len = 70;
 int IOHandler::subtitle_max_len = 50;
 int IOHandler::msg_padding_len = 5;
 
-// OUTPUT METHODS
 
-//--- OLD METHOD - NO SCROLL ---//
-// void IOHandler::clear_terminal() {
-    // #ifdef _WIN32
-    //     system("cls");
-    // #else
-    //     system("clear");
-    // #endif
-    // }
+
+
+
+//============= DATAPULE SPECIFIC METHODS =============//
+
+bool IOHandler::file_exists(string &filepath) {
+    struct stat sb;
+
+    // Calls the function with path as argument
+    // If the file/directory exists at the path, stat returns 0.
+    if (stat(filepath.c_str(), &sb) == 0) {
+        std::cout << "The path is valid!" << endl;
+        return true;
+    } else {
+        std::cout << "The path is invalid!" << endl;
+        return false;
+    }
+}
+
+bool IOHandler::validate_unix_filepath(string &filepath){
+    // Credits: Cjxcz Odjcayrwl on StackOverflow
+    // Link: https://stackoverflow.com/questions/537772/what-is-the-most-correct-regular-expression-for-a-unix-file-path
+    regex linux_path_regex("^(?:/|/[^/\\\\]+(?:/[^/\\\\]+)*/?)$");
+
+
+    return regex_match(filepath, linux_path_regex);;
+}
+
+//----- Command Line Argument Handler -----//
+bool IOHandler::is_valid(int argc, const char * argv[]){
+    return false;
+}  
+
+
+bool IOHandler::is_network_command(int argc, const char * argv[]){
+    //datap <host> <username> <remote_path> <local_path>
+    //datap <host> <username> <remote_path> <local_path> <priv_key_path>
+    //datap <host> <-flag> <username> <remote_path> <local_path>
+    //datap <host> <-flag> <username> <remote_path> <local_path> <priv_key_path>
     
+    int min_args = 5;
+    int max_args = 7; // With -m flag (merge) + priv_key_path
+    int offset = 0;
+    
+    string host = "";
+    string username = "";
+    string remote_path = "";
+    string local_path = "";
+    string priv_key_path = "";
+    
+    string flag = "";
+    
+    
+    // Invalid amount of arguments
+    if (argc < min_args || max_args < argc) return false;
+    
+    // If there is more than minimum, then check if the 
+    if (string(argv[2]) == "-m"){
+        flag = argv[2];
+        offset = 1;
+        // cout << endl << "WE BE FLAGGING ME MAN!" << endl;
+    } 
+    // else {
+        //     cout << endl << "Nah we aint flagging" << endl;
+        // }
+        
+    host = argv[1]; // No offset since it's the first element
+    username = argv[2+offset];
+    remote_path = argv[3+offset];
+    if (4+offset < argc)
+        local_path = argv[4+offset];
+    
+
+    if(argc == max_args || (offset == 0 && 5 < argc) ){
+        priv_key_path = argv[5+offset];
+    }
+
+    // cout << endl << "------------- Let's see what args we have -------------" << endl << endl;
+
+    // cout << "\t==> Total args (argx): " << argc << endl;
+    // cout << "\thost: " << host << endl;
+    // cout << "\tflag: " << flag << endl;
+    // cout << "\tusername: " << username << endl;
+    // cout << "\tremote_path: " << remote_path << endl;
+    // cout << "\tlocal_path: " << local_path << endl;
+    // cout << "\tpriv_key_path: " << priv_key_path << endl;
+    // cout << endl << "-------------------------------------------------------" << endl;
+
+
+    // // Validate that the file exists
+    if (!IOHandler::file_exists(local_path)) {
+        cout << "Local directory `" << local_path << "` does not exist" << endl;
+        // private key file does not exist
+        return false;
+    }
+    
+    if (!IOHandler::validate_unix_filepath(remote_path)) {
+        cout << "Remote directory `" << remote_path << "` does not fulfill our Regex" << endl;
+        return false;
+    }
+
+
+    return true;
+}
+
+
+bool IOHandler::is_help_command(int argc, const char * argv[]){
+    return false;
+}
+
+
+
+//=====================================================//
+
+
+
+
+
+
+// OUTPUT METHODS
     
 //--- NEW METHOD - WITH SCROLL ---//
 void IOHandler::clear_terminal() {

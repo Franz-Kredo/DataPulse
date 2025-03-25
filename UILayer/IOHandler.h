@@ -5,12 +5,16 @@
 #include <vector>
 #include <unordered_map>
 #include <string>
+#include <regex>
 
 // using std::string;
 // using std::vector;
 // using std::unordered_map;
+#include <sys/stat.h>
 
 using namespace std;
+
+
 
 
 class IOHandler {
@@ -22,6 +26,24 @@ public:
     static int title_max_len;
     static int subtitle_max_len;
     static int msg_padding_len;
+    const int MAX_LINUX_PATH_LENGTH = 4095;
+
+
+    //============= DATAPULE SPECIFIC METHODS =============//
+
+    //----- Command Line Argument Handler -----//
+    static bool file_exists(string &filepath);
+    static bool validate_unix_filepath(string &filepath);
+
+
+
+    static bool is_valid(int argc, const char * argv[]);
+    static bool is_network_command(int argc, const char * argv[]);
+    static bool is_help_command(int argc, const char * argv[]);
+
+    //=====================================================//
+
+
 
     // OUTPUT METHODS
     static void clear_terminal();
