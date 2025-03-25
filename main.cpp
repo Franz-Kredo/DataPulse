@@ -1,11 +1,13 @@
 #include <libssh/libssh.h>
 #include <iostream>
+#include "UILayer/IOHandler.h"
+
 
 using namespace std;
 
 int main(int argc, const char * argv[]) {
-    cout << argc << endl;
 
+    IOHandler::output_title("test");
     // for(char item: argv){
         
     // }
