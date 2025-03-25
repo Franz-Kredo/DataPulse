@@ -104,16 +104,16 @@ bool IOHandler::is_network_command(int argc, const char * argv[]){
         priv_key_path = argv[5+offset];
     }
 
-    cout << endl << "------------- Let's see what args we have -------------" << endl << endl;
+    // cout << endl << "------------- Let's see what args we have -------------" << endl << endl;
 
-    cout << "\t==> Total args (argx): " << argc << endl;
-    cout << "\thost: " << host << endl;
-    cout << "\tflag: " << flag << endl;
-    cout << "\tusername: " << username << endl;
-    cout << "\tremote_path: " << remote_path << endl;
-    cout << "\tlocal_path: " << local_path << endl;
-    cout << "\tpriv_key_path: " << priv_key_path << endl;
-    cout << endl << "-------------------------------------------------------" << endl;
+    // cout << "\t==> Total args (argx): " << argc << endl;
+    // cout << "\thost: " << host << endl;
+    // cout << "\tflag: " << flag << endl;
+    // cout << "\tusername: " << username << endl;
+    // cout << "\tremote_path: " << remote_path << endl;
+    // cout << "\tlocal_path: " << local_path << endl;
+    // cout << "\tpriv_key_path: " << priv_key_path << endl;
+    // cout << endl << "-------------------------------------------------------" << endl;
 
 
     // // Validate that the file exists
