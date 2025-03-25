@@ -34,7 +34,9 @@ debug: clean
 
 # Run the executable
 run: $(TARGET)
-	./$(TARGET)
+	./$(TARGET) cool
+
+
 
 # "short" target: incremental build that compiles only changed source files
 short: $(OBJFILES)

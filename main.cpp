@@ -1,13 +1,17 @@
 #include <libssh/libssh.h>
 #include <iostream>
 
-int main() {
-    ssh_session session = ssh_new();
-    if (!session) {
-        std::cerr << "Failed to create SSH session." << std::endl;
-        return 1;
+using namespace std;
+
+int main(int argc, const char * argv[]) {
+    cout << argc << endl;
+
+    // for(char item: argv){
+        
+    // }
+    for (int i = 0; i < argc; i++) {
+        cout << "Argument " << i << ": " << argv[i] << endl;
     }
-    std::cout << "Successfully created SSH session." << std::endl;
-    ssh_free(session);
+
     return 0;
 }
