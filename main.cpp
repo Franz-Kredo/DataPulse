@@ -38,6 +38,10 @@ int main(int argc, const char * argv[]) {
     
     if(networkCommandModel) {
         ret_msg = syncWrapper->sync_with_remote(networkCommandModel);
+        
+        // This might break since the NetworkLogic may or may not be initiated
+        syncWrapper->networkLogic->list_remote_directory(networkCommandModel);
+
         if (!ret_msg.empty() && ret_msg[0] == '!') {
             ret_msg.erase(0, 1);
             box_color = "pink";

@@ -14,9 +14,9 @@ PlaceholderModel *DataLogic::read_data(CommandModel *commandModel){
     PlaceholderModel *read_remote = this->read_remote(commandModel); 
     
     // Throw messages to main to print more info for user
-    if (read_locally == nullptr && read_remote == nullptr) throw runtime_error("Error: Failed reading both local and remote files.");
-    if (read_locally == nullptr) throw runtime_error("Error: Failed reading local files.");
-    if (read_remote == nullptr) throw runtime_error("Error: Failed reading remote files.");
+    if (read_locally == nullptr && read_remote == nullptr) throw runtime_error("[Need DataModel and FileModel to implement fully] Error: Failed reading both local and remote files.");
+    if (read_locally == nullptr) throw runtime_error("[Need DataModel and FileModel to implement fully] Error: Failed reading local files.");
+    if (read_remote == nullptr) throw runtime_error("[Need DataModel and FileModel to implement fully] Error: Failed reading remote files.");
 
     //TODO Here we will generate the DataModel and return it
     return nullptr;
@@ -28,9 +28,9 @@ PlaceholderModel *DataLogic::write_data(PlaceholderModel *dataModel){
     
     
     // Throw messages to main to print more info for user
-    if (write_locally == nullptr && write_remote == nullptr) throw runtime_error("Error: Failed writing both local and remote files.");
-    if (write_locally == nullptr) throw runtime_error("Error: Failed writing to local files.");
-    if (write_remote == nullptr) throw runtime_error("Error: Failed writing to remote files.");
+    if (write_locally == nullptr && write_remote == nullptr) throw runtime_error("[Need DataModel and FileModel to implement fully] Error: Failed writing both local and remote files.");
+    if (write_locally == nullptr) throw runtime_error("[Need DataModel and FileModel to implement fully] Error: Failed writing to local files.");
+    if (write_remote == nullptr) throw runtime_error("[Need DataModel and FileModel to implement fully] Error: Failed writing to remote files.");
 
     return nullptr;
 }
