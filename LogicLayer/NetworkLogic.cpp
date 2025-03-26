@@ -63,7 +63,7 @@ string NetworkLogic::prompt_hidden(string const &prompt) {
     newt.c_lflag &= ~ECHO;
     tcsetattr(STDIN_FILENO, TCSANOW, &newt);
     getline(cin, password);
-    // Restore the backed of state of the terminal
+    // Restore the backed up state of the terminal
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
     cout << endl;
     return password;

@@ -6,7 +6,7 @@ INCLUDES = -Iinclude
 LIBS = -lssh
 
 # Production source files (all .cpp files in src/ and its subdirectories)
-PROD_SRC = $(wildcard src/*.cpp) $(wildcard src/*/*.cpp) $(wildcard UILayer/*.cpp) $(wildcard Models/*.cpp) $(wildcard LogicLayer/*.cpp)
+PROD_SRC = $(wildcard src/*.cpp) $(wildcard src/*/*.cpp) $(wildcard UILayer/*.cpp) $(wildcard Models/*.cpp) $(wildcard LogicLayer/*.cpp) $(wildcard Tests/LexiTests/*.cpp)
 PROD_OBJ = $(PROD_SRC:.cpp=.o)
 
 # All source files for the main build: main.cpp plus the production sources
