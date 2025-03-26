@@ -42,12 +42,16 @@ public:
     //----- Command Line Argument Handler -----//
     static bool file_exists(string &filepath);
     static bool validate_unix_filepath(string &filepath);
-
-
-
+    
+    
+    
     static bool is_valid(int argc, const char * argv[]);
     static CommandModel *is_network_command(int argc, const char * argv[]);
     static bool is_help_command(int argc, const char * argv[]);
+    
+    //----- Printing Help Page -----//
+    static void display_help_page();
+    
 
     //=====================================================//
 

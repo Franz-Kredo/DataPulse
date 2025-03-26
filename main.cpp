@@ -41,6 +41,10 @@ int main(int argc, const char * argv[]) {
     
     if(networkCommandModel) {
         ret_msg = syncWrapper->sync_with_remote(networkCommandModel);
+        
+        // This might break since the NetworkLogic may or may not be initiated
+        syncWrapper->networkLogic->list_remote_directory(networkCommandModel);
+
         if (!ret_msg.empty() && ret_msg[0] == '!') {
             ret_msg.erase(0, 1);
             box_color = "pink";
@@ -48,6 +52,8 @@ int main(int argc, const char * argv[]) {
     } 
     else if(is_help_command) {
         ret_msg = "The help page should be displayed here.";
+        IOHandler::display_help_page();
+        return 0;
     } 
     else {
         ret_msg = "Hmm, this is neither help or network command, maybe try the help pages?";
