@@ -49,6 +49,8 @@ int main(int argc, const char * argv[]) {
     } 
     else if(is_help_command) {
         ret_msg = "The help page should be displayed here.";
+        IOHandler::display_help_page();
+        return 0;
     } 
     else {
         ret_msg = "Hmm, this is neither help or network command, maybe try the help pages?";

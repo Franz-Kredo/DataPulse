@@ -166,6 +166,119 @@ bool IOHandler::is_help_command(int argc, const char * argv[]){
 }
 
 
+void IOHandler::display_help_page() {
+    IOHandler::clear_terminal();
+    IOHandler::output_subtitle("DataPulse Help Page", "pink");
+    const std::string helpText = R"(
+Usage:
+  datapulse [options] <host> <username> <remote_path> <local_path> [priv_key_path]
+
+Options:
+  -h              Display this help message and exit.
+  -m              Enable merge mode (if applicable).
+  -t              [pending] Tests the ssh/sftp connection.
+
+Usage with options:
+  datapulse -h
+  datapulse -m 192.168.50.42 remote_username /home/remote_username/someFolder /home/localuser/someOtherFolder /home/localuser/.ssh/priv_key
+  datapulse -t 192.168.50.42 remote_username /home/remote_username/someFolder /home/localuser/someOtherFolder /home/localuser/.ssh/priv_key
+
+Arguments:
+  <host>         The remote host address (IP or domain name).
+  <username>     The username for the remote connection.
+  <remote_path>  The absolute path to the remote directory (must be a valid UNIX filepath).
+  <local_path>   The local directory path (must exist on your system).
+  [priv_key_path] (Optional) The file path to your SSH private key for authentication.
+
+Description:
+  DataPulse is a command‑line application designed to synchronize files between a
+  local directory and a remote directory over SFTP. It establishes an SSH connection
+  using the provided credentials, reads files from both locations, marks files that
+  are eligible for synchronization, and writes updates back to both locations.
+
+Examples:
+  Basic synchronization:
+    datapulse 192.168.1.100 user /remote/directory /local/directory
+
+  Using a private key for SSH authentication:
+    datapulse 192.168.1.100 user /remote/directory /local/directory /path/to/private_key
+
+  With merge mode enabled:
+    datapulse 192.168.1.100 -m user /remote/directory /local/directory
+
+Build Instructions:
+  - Ensure g++ with C++17 support is installed.
+  - Use the provided makefile:
+      make       : Build the executable.
+      make debug : Build the debug version.
+
+Troubleshooting:
+  - Verify that the local directory exists.
+  - Ensure the remote path follows UNIX filepath conventions.
+  - Check your SSH credentials and private key file if authentication fails.
+
+For further assistance, refer to the project documentation or contact the development team.
+    )";
+
+    std::cout << helpText;
+}
+
+// void IOHandler::display_help_page() {
+
+
+//     cout << "\nDataPulse Help Page\n";
+//     cout << "===================\n\n";
+
+//     cout << "Usage:\n";
+//     cout << "  datapulse [options] <host> <username> <remote_path> <local_path> [priv_key_path]\n\n";
+    
+//     cout << "Options:\n";
+//     cout << "  -h              Display this help message and exit.\n";
+//     cout << "  -m              Enable merge mode (if applicable).\n\n";
+//     cout << "  -t              [pending] Tests the ssh/sftp connection.\n";
+
+
+//     cout << "Usage with options:\n";
+//     cout << "  datapulse -h\n";
+//     cout << "  datapulse -m 192.168.50.42 remote_username /home//someFolder /home/localuser/someOtherFolder /home/localuser/.ssh/priv_key\n\n";
+//     cout << "  datapulse -t 192.168.50.42 remote_username /home//someFolder /home/localuser/someOtherFolder /home/localuser/.ssh/priv_key\n\n";
+
+//     cout << "Arguments:\n";
+//     cout << "  <host>         The remote host address (IP or domain name).\n";
+//     cout << "  <username>     The username for the remote connection.\n";
+//     cout << "  <remote_path>  The absolute path to the remote directory (must be a valid UNIX filepath).\n";
+//     cout << "  <local_path>   The local directory path (must exist on your system).\n";
+//     cout << "  [priv_key_path] (Optional) The file path to your SSH private key for authentication.\n\n";
+
+//     cout << "Description:\n";
+//     cout << "  DataPulse is a command‑line application designed to synchronize files between a\n";
+//     cout << "  local directory and a remote directory over SFTP. It establishes an SSH connection\n";
+//     cout << "  using the provided credentials, reads files from both locations, marks files that\n";
+//     cout << "  are eligible for synchronization, and writes updates back to both locations.\n\n";
+
+//     cout << "Examples:\n";
+//     cout << "  Basic synchronization:\n";
+//     cout << "    datapulse 192.168.1.100 user /remote/directory /local/directory\n\n";
+
+//     cout << "  Using a private key for SSH authentication:\n";
+//     cout << "    datapulse 192.168.1.100 user /remote/directory /local/directory /path/to/private_key\n\n";
+
+//     cout << "  With merge mode enabled:\n";
+//     cout << "    datapulse 192.168.1.100 -m user /remote/directory /local/directory\n\n";
+
+//     cout << "Build Instructions:\n";
+//     cout << "  - Ensure g++ with C++17 support is installed.\n";
+//     cout << "  - Use the provided makefile:\n";
+//     cout << "      make       : Build the executable.\n";
+//     cout << "      make debug : Build the debug version.\n\n";
+
+//     cout << "Troubleshooting:\n";
+//     cout << "  - Verify that the local directory exists.\n";
+//     cout << "  - Ensure the remote path follows UNIX filepath conventions.\n";
+//     cout << "  - Check your SSH credentials and private key file if authentication fails.\n\n";
+
+//     cout << "For further assistance, refer to the project documentation or contact the development team.\n\n";
+// }
 
 //=====================================================//
 
