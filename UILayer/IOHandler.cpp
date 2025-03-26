@@ -57,14 +57,15 @@ bool IOHandler::validate_unix_filepath(string &filepath){
 
 //----- Command Line Argument Handler -----//
 bool IOHandler::is_valid(int argc, const char * argv[]){
-    bool valid_net_command = IOHandler::is_network_command(argc, argv);
-    bool valid_help_command = IOHandler::is_help_command(argc, argv);
+    // bool valid_net_command = IOHandler::is_network_command(argc, argv);
+    // bool valid_help_command = IOHandler::is_help_command(argc, argv);
 
-    return (valid_net_command || valid_help_command);
+    // return (valid_net_command || valid_help_command);
+    return false;
 }  
 
 
-bool IOHandler::is_network_command(int argc, const char * argv[]){
+CommandModel *IOHandler::is_network_command(int argc, const char * argv[]){
     
     //datap <host> <username> <remote_path> <local_path>
     //datap <host> <username> <remote_path> <local_path> <priv_key_path>
@@ -86,13 +87,18 @@ bool IOHandler::is_network_command(int argc, const char * argv[]){
     
     
     // Invalid amount of arguments
-    if (argc < min_args || max_args < argc) return false;
+    if (argc < min_args || max_args < argc) return nullptr;
     
     // If there is more than minimum, then check if the 
     if (string(argv[2]) == "-m"){
         flag = argv[2];
         offset = 1;
     } 
+    // I know, it's a little reduntant
+    // I'm simply checking if there are too many argument, if there is no flag, then there should be max_args-1 amount or less
+    else if(argc >= max_args && string(argv[2]) != "-m"){
+        return nullptr;
+    }
         
     host = argv[1]; // No offset since it's the first element
     username = argv[2+offset];
@@ -121,24 +127,25 @@ bool IOHandler::is_network_command(int argc, const char * argv[]){
     if (!IOHandler::file_exists(local_path)) {
         cout << "Local directory `" << local_path << "` does not exist" << endl;
         // private key file does not exist
-        return false;
+        return nullptr;
     }
     
     if (!IOHandler::validate_unix_filepath(remote_path)) {
         cout << "Remote directory `" << remote_path << "` does not fulfill our Regex" << endl;
-        return false;
+        return nullptr;
     }
+    
+    CommandModel *retCommandModel = new CommandModel;
 
 
-    // IOHandler::commandModel->set_host(host);
-    // IOHandler::commandModel->set_username(username);
-    // IOHandler::commandModel->set_remote_path(remote_path);
-    // IOHandler::commandModel->set_local_path(local_path);
-    // IOHandler::commandModel->set_priv_key_path(priv_key_path);
-    // IOHandler::commandModel->set_flag(flag);
+    retCommandModel->set_host(host);
+    retCommandModel->set_username(username);
+    retCommandModel->set_remote_path(remote_path);
+    retCommandModel->set_local_path(local_path);
+    retCommandModel->set_priv_key_path(priv_key_path);
 
 
-    return true;
+    return retCommandModel;
 }
 
 
@@ -189,7 +196,7 @@ void IOHandler::wait(unsigned int seconds) {
 }
 
 void IOHandler::output_title(const string &title, string color) {
-    IOHandler::clear_terminal();
+    // IOHandler::clear_terminal();
 
     // IOHandler::clear_terminal(); // Maybe add this back later, talk to team (Franz)
     vector<string> content;
