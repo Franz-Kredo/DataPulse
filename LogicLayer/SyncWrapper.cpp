@@ -22,7 +22,7 @@ string SyncWrapper::sync_with_remote(CommandModel *commandModel){
 
         // Try to read data locally and remotely
         PlaceholderModel *dataModel = this->dataLogic->read_data(commandModel);
-        return "Sync succeeded";
+        
     } 
     catch (const runtime_error &e) {
         cerr << "!Runtime error occurred: " << e.what() << endl;
@@ -37,13 +37,6 @@ string SyncWrapper::sync_with_remote(CommandModel *commandModel){
         return "!Unknown error.";
     }
 
-    // Try to read from local
-    PlaceholderModel *local_files = this->dataLogic->read_data(commandModel);
 
-
-    
-    
-
-
-    return "ret message";
+    return "Sync succeeded";
 }

@@ -49,7 +49,6 @@ int main(int argc, const char * argv[]) {
     else {
         ret_msg = "Hmm, this is neither help or network command, maybe try the help pages?";
         box_color = "purple";
-        return 0;
     }
     
     IOHandler::output_title(ret_msg, box_color);

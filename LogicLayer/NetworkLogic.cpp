@@ -7,7 +7,7 @@
 NetworkLogic::NetworkLogic(CommandModel *commandModel)
 {
     ssh_session sshSession = ssh_new();
-    if (!sshSession) throw std::runtime_error("Failed to create SSH session");
+    if (!sshSession) throw std::runtime_error("!Failed to create SSH session");
 
     // Migh need to be cast to c_str()
     ssh_options_set(sshSession, SSH_OPTIONS_HOST, commandModel->get_host().c_str());
@@ -15,13 +15,13 @@ NetworkLogic::NetworkLogic(CommandModel *commandModel)
     ssh_options_set(sshSession, SSH_OPTIONS_ADD_IDENTITY, commandModel->get_priv_key_path().c_str());
 
     if (ssh_connect(sshSession) != SSH_OK)
-        throw std::runtime_error("SSH connection failed: " + std::string(ssh_get_error(sshSession)));
+        throw std::runtime_error("!SSH connection failed: " + std::string(ssh_get_error(sshSession)));
     if (ssh_userauth_publickey_auto(sshSession, nullptr, nullptr) != SSH_AUTH_SUCCESS) {
         // Maybe add logic to check if the key is encrypted to store in model?
         // That way we only prompt for password if the body of the key is encrypted?
         std::string passphrase = this->prompt_hidden("Enter passphrase for key '" + commandModel->get_priv_key_path() + "':");
         if (ssh_userauth_publickey_auto(sshSession, nullptr, passphrase.c_str()) != SSH_AUTH_SUCCESS) {
-            throw std::runtime_error("SSH authentication failed" + std::string(ssh_get_error(sshSession)));
+            throw std::runtime_error("!SSH authentication failed" + std::string(ssh_get_error(sshSession)));
     }
 }
 
