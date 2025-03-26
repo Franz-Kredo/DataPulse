@@ -24,8 +24,8 @@ void test_network_connection(){
 
 
 int main(int argc, const char * argv[]) {
-    TestHandler().test_local_file_ops();
-    return 0;
+    // TestHandler().test_local_file_ops();
+    // return 0;
     string ret_msg;
     string box_color = "orange";
 
