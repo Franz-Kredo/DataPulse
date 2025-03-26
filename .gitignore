@@ -37,6 +37,7 @@ printify.sh
 /data/all_fil*.md
 /data
 
+/Tests/LexiTests/*txt
 
 .vscode/
 

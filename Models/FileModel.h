@@ -42,6 +42,7 @@ public:
 	bool get_can_sync() const {return this->can_sync;}	
 	vector<byte> get_buffer() const {return this->buffer;}	
 	bool get_fully_read() const {return this->fully_read;}	
+	size_t get_bytes_read() const {return this->bytes_read;}
 
 
 	void set_path(string path) { this->path = path;}	
@@ -51,9 +52,11 @@ public:
 	void set_write_perm(bool perm)  { this->write_perm = perm;}	
 	void set_can_sync(bool status)  { this->can_sync = status;}	
 	void set_fully_read(bool status)  { this->fully_read = status;}	
+	void increase_bytes_read(size_t bytes) { this->bytes_read+=bytes;}
 
 
-	void read_to_buffer(vector<byte> data); 
+	void populate_buffer(vector<byte> data); 
+	void clear_buffer();
 
 private:
 };

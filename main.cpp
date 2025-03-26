@@ -7,6 +7,7 @@
 #include "UILayer/IOHandler.h"
 #include "LogicLayer/SyncWrapper.h"
 #include "LogicLayer/NetworkLogic.h"
+#include "Tests/LexiTests/TestHandler.h"
 
 
 
@@ -34,6 +35,8 @@ void test_network_connection(){
 
 
 int main(int argc, const char * argv[]) {
+    // TestHandler().test_local_file_ops();
+    // return 0;
     string ret_msg;
     string box_color = "orange";
 
