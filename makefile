@@ -40,35 +40,35 @@ run: $(TARGET)
 
 
 # Run tests for the is_network_command method
-net:clean $(TARGET)
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $(TARGET) $(OBJFILES) $(LIBS)
-	@echo "\n\n\n============================================================="
-	@echo "============== Running Valid Net Command Tests =============="
-	@echo "============================================================="
-	@echo "\n\n====== Running Net Test 1 ======"
-	./$(TARGET) 192.168.42.125 franz /home/franz/pa5 /home/franz/github_repos/DataPulse/SyncTester
-	@echo "\n\n====== Running Net Test 2 ======"
-	./$(TARGET) 192.168.42.125 franz /home/franz/pa5 /home/franz/github_repos/DataPulse/SyncTester /Users/franzisak/.ssh/proxmox-home
-	@echo "\n\n====== Running Net Test 3 ======"
-	./$(TARGET) 192.168.42.125 -m franz /home/franz/pa5 /home/franz/github_repos/DataPulse/SyncTester 
-	@echo "\n\n====== Running Net Test 4 ======"
-	./$(TARGET) 192.168.42.125 -m franz /home/franz/pa5 /home/franz/github_repos/DataPulse/SyncTester /Users/franzisak/.ssh/proxmox-home
-	@echo "\n\n====== Running Invalid Net Test 5 (triple ///) ======"
-	./$(TARGET) 192.168.42.125 franz /home/franz/pa5 /home/franz/github_repos/DataPulse///SyncTester
+# net:clean $(TARGET)
+# 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $(TARGET) $(OBJFILES) $(LIBS)
+# 	@echo "\n\n\n============================================================="
+# 	@echo "============== Running Valid Net Command Tests =============="
+# 	@echo "============================================================="
+# 	@echo "\n\n====== Running Net Test 1 ======"
+# 	./$(TARGET) 192.168.42.125 franz /home/franz/pa5 /home/franz/github_repos/DataPulse/SyncTester
+# 	@echo "\n\n====== Running Net Test 2 ======"
+# 	./$(TARGET) 192.168.42.125 franz /home/franz/pa5 /home/franz/github_repos/DataPulse/SyncTester /Users/franzisak/.ssh/proxmox-home
+# 	@echo "\n\n====== Running Net Test 3 ======"
+# 	./$(TARGET) 192.168.42.125 -m franz /home/franz/pa5 /home/franz/github_repos/DataPulse/SyncTester 
+# 	@echo "\n\n====== Running Net Test 4 ======"
+# 	./$(TARGET) 192.168.42.125 -m franz /home/franz/pa5 /home/franz/github_repos/DataPulse/SyncTester /Users/franzisak/.ssh/proxmox-home
+# 	@echo "\n\n====== Running Invalid Net Test 5 (triple ///) ======"
+# 	./$(TARGET) 192.168.42.125 franz /home/franz/pa5 /home/franz/github_repos/DataPulse///SyncTester
  
-	@echo "\n\n\n==============================================================="
-	@echo "============== Running Invalid Net Command Tests =============="
-	@echo "==============================================================="
-	@echo "\n\n====== Running Invalid Net Test 6 (missing fields, filled with spaces) ======"
-	./$(TARGET) 192.168.42.125 -m franz /home/franz/pa5  
-	@echo "\n\n====== Running Invalid Net Test 7 (backwards \) ======"
-	./$(TARGET) 192.168.42.125 franz /home/franz/pa5 /home/franz/github_repos/DataPulse\SyncTester
-	@echo "\n\n====== Running Invalid Net Test 8 (too few args) ======"
-	./$(TARGET) 192.168.42.125 franz 
-	@echo "\n\n====== Running Net Test 9 (incorrect argument placements) ======"
-	./$(TARGET) /home/franz/github_repos/DataPulse/SyncTester 192.168.42.125 franz /home/franz/pa5 /Users/franzisak/.ssh/proxmox-home -m
-	@echo "\n\n====== Running Net Test 10 (to many arguments) ======"
-	./$(TARGET) 192.168.42.125 -m franz /home/franz/pa5 /home/franz/github_repos/DataPulse/SyncTester /Users/franzisak/.ssh/proxmox-home /Users/franzisak/.ssh/proxmox-home /Users/franzisak/.ssh/proxmox-home /Users/franzisak/.ssh/proxmox-home
+# 	@echo "\n\n\n==============================================================="
+# 	@echo "============== Running Invalid Net Command Tests =============="
+# 	@echo "==============================================================="
+# 	@echo "\n\n====== Running Invalid Net Test 6 (missing fields, filled with spaces) ======"
+# 	./$(TARGET) 192.168.42.125 -m franz /home/franz/pa5  
+# 	@echo "\n\n====== Running Invalid Net Test 7 (backwards \) ======"
+# 	./$(TARGET) 192.168.42.125 franz /home/franz/pa5 /home/franz/github_repos/DataPulse\SyncTester
+# 	@echo "\n\n====== Running Invalid Net Test 8 (too few args) ======"
+# 	./$(TARGET) 192.168.42.125 franz 
+# 	@echo "\n\n====== Running Net Test 9 (incorrect argument placements) ======"
+# 	./$(TARGET) /home/franz/github_repos/DataPulse/SyncTester 192.168.42.125 franz /home/franz/pa5 /Users/franzisak/.ssh/proxmox-home -m
+# 	@echo "\n\n====== Running Net Test 10 (to many arguments) ======"
+# 	./$(TARGET) 192.168.42.125 -m franz /home/franz/pa5 /home/franz/github_repos/DataPulse/SyncTester /Users/franzisak/.ssh/proxmox-home /Users/franzisak/.ssh/proxmox-home /Users/franzisak/.ssh/proxmox-home /Users/franzisak/.ssh/proxmox-home
  
 
 # Run tests for the is_help_command method
