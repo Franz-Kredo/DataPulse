@@ -19,6 +19,7 @@ class CommandModel {
 	string remote_path;
 	string local_path;
 	string priv_key_path; 
+	string flag; 
 	bool merge;
 
 public:
@@ -31,6 +32,7 @@ public:
 	string get_remote_path() const {return this->remote_path;}	
 	string get_local_path() const {return this->local_path;}	
 	string get_priv_key_path() const {return this->priv_key_path;}	
+	string get_flag() const {return this->flag;}	
 	bool get_merge() const {return this->merge;}	
 
 	void set_host(string host) { this->host = host;}	
@@ -38,6 +40,7 @@ public:
 	void set_remote_path(string remote_path) {this->remote_path = remote_path;}	
 	void set_local_path(string local_path) {this->local_path = local_path;}	
 	void set_priv_key_path(string priv_key_path) {this->priv_key_path = priv_key_path;}	
+	void set_flag(string flag) {this->flag = flag;}	
 	void set_merge(bool merge) {this->merge = merge;}	
 
 

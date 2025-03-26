@@ -5,6 +5,7 @@
 #include <thread>
 
 
+
 // Define static members
 const string IOHandler::reset_code = "\033[0m";
 const unordered_map<string, string> IOHandler::neon_colors = {
@@ -25,7 +26,6 @@ unordered_map<char, string> IOHandler::neon_color_map = {
 int IOHandler::title_max_len = 70;
 int IOHandler::subtitle_max_len = 50;
 int IOHandler::msg_padding_len = 5;
-
 
 
 
@@ -65,6 +65,7 @@ bool IOHandler::is_valid(int argc, const char * argv[]){
 
 
 bool IOHandler::is_network_command(int argc, const char * argv[]){
+    
     //datap <host> <username> <remote_path> <local_path>
     //datap <host> <username> <remote_path> <local_path> <priv_key_path>
     //datap <host> <-flag> <username> <remote_path> <local_path>
@@ -81,6 +82,7 @@ bool IOHandler::is_network_command(int argc, const char * argv[]){
     string priv_key_path = "";
     
     string flag = "";
+
     
     
     // Invalid amount of arguments
@@ -126,6 +128,14 @@ bool IOHandler::is_network_command(int argc, const char * argv[]){
         cout << "Remote directory `" << remote_path << "` does not fulfill our Regex" << endl;
         return false;
     }
+
+
+    // IOHandler::commandModel->set_host(host);
+    // IOHandler::commandModel->set_username(username);
+    // IOHandler::commandModel->set_remote_path(remote_path);
+    // IOHandler::commandModel->set_local_path(local_path);
+    // IOHandler::commandModel->set_priv_key_path(priv_key_path);
+    // IOHandler::commandModel->set_flag(flag);
 
 
     return true;
