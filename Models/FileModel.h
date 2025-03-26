@@ -1,19 +1,21 @@
 #ifndef FILE_MODEL_H
 #define FILE_MODEL_H
 
-#include <cstddef>
+// #include <cstddef>
 #include <string>
 #include <vector>
 #include <unordered_map>
 #include <iostream>
 #include <libssh/libssh.h>
 #include <libssh/sftp.h>
-#include <cstddef> // for std::byte
 #include <iostream>
+#include <cstddef> // for std::byte
 
 
 using namespace std;
 
+
+using std::byte;
 
 
 class FileModel {

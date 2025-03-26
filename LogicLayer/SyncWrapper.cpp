@@ -21,7 +21,7 @@ string SyncWrapper::sync_with_remote(CommandModel *commandModel){
         // this->networkLogic->list_remote_directory(commandModel);
 
         // Try to read data locally and remotely
-        PlaceholderModel *dataModel = this->dataLogic->read_data(commandModel);
+        DataModel *dataModel = this->dataLogic->read_data(commandModel);
         
     } 
     catch (const runtime_error &e) {

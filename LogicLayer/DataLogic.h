@@ -3,6 +3,8 @@
 #define DATALOGIC_H
 
 #include "../Models/CommandModel.h"
+#include "../Models/FileModel.h"
+#include "../Models/DataModel.h"
 #include "../Models/PlaceholderModel.h"
 
 
@@ -20,7 +22,7 @@ public:
      * @param commandModel: Takes in the an instance of CommandModel made from args from the terminal (mostly to get local path)
      * @returns DataModel: [using placeholder until FileModel is rdy] 
      */
-    PlaceholderModel *read_data(CommandModel *commandModel);
+    DataModel *read_data(CommandModel *commandModel);
     /*
      * @brief Uses the DataModel to write at local and remote directories using internal methods
      *
@@ -37,17 +39,17 @@ private:
      * @brief Uses the CommandModel to read from local directories, and store them in an unordered map of key:name(str) and value:FileModel
      *
      * @param commandModel: Takes in the an instance of CommandModel made from args from the terminal (mostly to get local path)
-     * @returns unordered_map<name:string, FileModel>:[using placeholder until FileModel is rdy] 
+     * @returns unordered_map<string, FileModel>:[using placeholder until FileModel is rdy] 
      */
-    PlaceholderModel *read_local(CommandModel *commandModel);
+    unordered_map<string, FileModel> *read_local(CommandModel *commandModel);
 
     /*
      * @brief Uses the CommandModel to read from remote directories via SFTP, and store them in an unordered map of key:name(str) and value:FileModel
      *
      * @param commandModel: Takes in the an instance of CommandModel made from args from the terminal
-     * @returns unordered_map<name:string, FileModel>: [using placeholder until FileModel is rdy] 
+     * @returns unordered_map<string, FileModel>: [using placeholder until FileModel is rdy] 
      */
-    PlaceholderModel *read_remote(CommandModel *commandModel);    
+    unordered_map<string, FileModel>  *read_remote(CommandModel *commandModel);    
 
     /*
      * @brief Uses the DataModel determine which files are syncable, then return the dataModel with syncable files marked
@@ -55,7 +57,7 @@ private:
      * @param dataModel: Takes in the an instance of DataModel made from args from the terminal
      * @returns DataModel: [using placeholder until FileModel is rdy]
      */
-    PlaceholderModel *mark_syncable_files(PlaceholderModel *dataModel);
+    DataModel *mark_syncable_files(DataModel *dataModel);
 
 
 
