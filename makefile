@@ -30,13 +30,13 @@ $(TARGET): $(OBJFILES)
 debug: clean
 	@echo "Building debug version..."
 	$(CXX) $(CXXFLAGS) $(CXXDEBUGFLAGS) $(INCLUDES) -o debug.out $(SRC_FILES) $(LIBS)
-	gdb ./debug.out
+	gdb --args ./debug.out 192.168.42.125 franz /home/franz/pa5 /home/franz/github_repos/DataPulse/SyncTester /home/franz/.ssh/pa5
 
 # Run the executable
 # $(CXX) $(CXXFLAGS) $(INCLUDES) -o $(TARGET) $(OBJFILES) $(LIBS)
+# ./$(TARGET) 
 run: $(TARGET)
-	./$(TARGET) 192.168.42.125 franz /home/franz/pa5 /home/franz/github_repos/DataPulse/SyncTester
-	./$(TARGET) 
+	./$(TARGET) 192.168.42.125 franz /home/franz/pa5 /home/franz/github_repos/DataPulse/SyncTester /home/franz/.ssh/pa5 
 
 
 # Run tests for the is_network_command method
@@ -111,7 +111,7 @@ fast:
 
 # Deb: launch debugger on the debug build
 deb:
-	gdb ./debug.out
+	gdb --args ./debug.out 192.168.42.125 franz /home/franz/pa5 /home/franz/github_repos/DataPulse/SyncTester
 
 # Pattern rule: compile any .cpp file into a .o file
 %.o: %.cpp

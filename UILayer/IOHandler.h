@@ -7,6 +7,9 @@
 #include <string>
 #include <regex>
 
+#include "../Models/CommandModel.h"
+
+
 // using std::string;
 // using std::vector;
 // using std::unordered_map;
@@ -26,6 +29,11 @@ public:
     static int title_max_len;
     static int subtitle_max_len;
     static int msg_padding_len;
+    
+    
+    CommandModel commandModel;
+
+
     const int MAX_LINUX_PATH_LENGTH = 4095;
 
 
@@ -38,7 +46,7 @@ public:
 
 
     static bool is_valid(int argc, const char * argv[]);
-    static bool is_network_command(int argc, const char * argv[]);
+    static CommandModel *is_network_command(int argc, const char * argv[]);
     static bool is_help_command(int argc, const char * argv[]);
 
     //=====================================================//

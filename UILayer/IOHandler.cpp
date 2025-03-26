@@ -5,6 +5,7 @@
 #include <thread>
 
 
+
 // Define static members
 const string IOHandler::reset_code = "\033[0m";
 const unordered_map<string, string> IOHandler::neon_colors = {
@@ -29,7 +30,6 @@ int IOHandler::msg_padding_len = 5;
 
 
 
-
 //============= DATAPULE SPECIFIC METHODS =============//
 
 bool IOHandler::file_exists(string &filepath) {
@@ -38,10 +38,10 @@ bool IOHandler::file_exists(string &filepath) {
     // Calls the function with path as argument
     // If the file/directory exists at the path, stat returns 0.
     if (stat(filepath.c_str(), &sb) == 0) {
-        std::cout << "The path is valid!" << endl;
+        cout << "The path is valid!" << endl;
         return true;
     } else {
-        std::cout << "The path is invalid!" << endl;
+        cout << "The path is invalid!" << endl;
         return false;
     }
 }
@@ -57,14 +57,16 @@ bool IOHandler::validate_unix_filepath(string &filepath){
 
 //----- Command Line Argument Handler -----//
 bool IOHandler::is_valid(int argc, const char * argv[]){
-    bool valid_net_command = IOHandler::is_network_command(argc, argv);
-    bool valid_help_command = IOHandler::is_help_command(argc, argv);
+    // bool valid_net_command = IOHandler::is_network_command(argc, argv);
+    // bool valid_help_command = IOHandler::is_help_command(argc, argv);
 
-    return (valid_net_command || valid_help_command);
+    // return (valid_net_command || valid_help_command);
+    return false;
 }  
 
 
-bool IOHandler::is_network_command(int argc, const char * argv[]){
+CommandModel *IOHandler::is_network_command(int argc, const char * argv[]){
+    
     //datap <host> <username> <remote_path> <local_path>
     //datap <host> <username> <remote_path> <local_path> <priv_key_path>
     //datap <host> <-flag> <username> <remote_path> <local_path>
@@ -81,16 +83,22 @@ bool IOHandler::is_network_command(int argc, const char * argv[]){
     string priv_key_path = "";
     
     string flag = "";
+
     
     
     // Invalid amount of arguments
-    if (argc < min_args || max_args < argc) return false;
+    if (argc < min_args || max_args < argc) return nullptr;
     
     // If there is more than minimum, then check if the 
     if (string(argv[2]) == "-m"){
         flag = argv[2];
         offset = 1;
     } 
+    // I know, it's a little reduntant
+    // I'm simply checking if there are too many argument, if there is no flag, then there should be max_args-1 amount or less
+    else if(argc >= max_args && string(argv[2]) != "-m"){
+        return nullptr;
+    }
         
     host = argv[1]; // No offset since it's the first element
     username = argv[2+offset];
@@ -119,16 +127,25 @@ bool IOHandler::is_network_command(int argc, const char * argv[]){
     if (!IOHandler::file_exists(local_path)) {
         cout << "Local directory `" << local_path << "` does not exist" << endl;
         // private key file does not exist
-        return false;
+        return nullptr;
     }
     
     if (!IOHandler::validate_unix_filepath(remote_path)) {
         cout << "Remote directory `" << remote_path << "` does not fulfill our Regex" << endl;
-        return false;
+        return nullptr;
     }
+    
+    CommandModel *retCommandModel = new CommandModel;
 
 
-    return true;
+    retCommandModel->set_host(host);
+    retCommandModel->set_username(username);
+    retCommandModel->set_remote_path(remote_path);
+    retCommandModel->set_local_path(local_path);
+    retCommandModel->set_priv_key_path(priv_key_path);
+
+
+    return retCommandModel;
 }
 
 
@@ -162,16 +179,16 @@ bool IOHandler::is_help_command(int argc, const char * argv[]){
 //--- NEW METHOD - WITH SCROLL ---//
 void IOHandler::clear_terminal() {
     // Move cursor to top
-    std::cout << "\033[H";
+    cout << "\033[H";
     
     // Fill the screen with blank lines
     const int lines_to_print = 100;
     for (int i = 0; i < lines_to_print; ++i) {
-        std::cout << "\n";
+        cout << "\n";
     }
 
     // Move cursor back to top
-    std::cout << "\033[H";
+    cout << "\033[H";
 }
 
 void IOHandler::wait(unsigned int seconds) {
@@ -179,7 +196,7 @@ void IOHandler::wait(unsigned int seconds) {
 }
 
 void IOHandler::output_title(const string &title, string color) {
-    IOHandler::clear_terminal();
+    // IOHandler::clear_terminal();
 
     // IOHandler::clear_terminal(); // Maybe add this back later, talk to team (Franz)
     vector<string> content;
@@ -201,15 +218,15 @@ void IOHandler::output_subtitle(const string &subtitle, string color) {
 }
 // void IOHandler::write_dialoge(string dialog){
 //      for (const char c : dialog) {
-//         std::cout << c << std::flush;
-//         std::this_thread::sleep_for(std::chrono::milliseconds(10));
+//         cout << c << flush;
+//         this_thread::sleep_for(chrono::milliseconds(10));
 //     }
 // }
 
 // void IOHandler::write_story(string dialog){
 //      for (const char c : dialog) {
-//         std::cout << c << std::flush;
-//         std::this_thread::sleep_for(std::chrono::milliseconds(5));
+//         cout << c << flush;
+//         this_thread::sleep_for(chrono::milliseconds(5));
 //     }
 // }
 
@@ -336,7 +353,7 @@ string IOHandler::colorize_box(string text, string color){
     try{
         color_code = IOHandler::neon_colors.at(color); 
     }
-    catch(const std::out_of_range &e) {
+    catch(const out_of_range &e) {
         color_code = "\033[38;2;255;165;0m";
     }
 
