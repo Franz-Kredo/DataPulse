@@ -19,12 +19,13 @@ void test_network_connection(){
     } catch (const exception &e) {
         cerr << "Exception: " << e.what() << endl;
     }
-
-
 }
+
 
 int main(int argc, const char * argv[]) {
     string ret_msg;
+    string box_color = "orange";
+
     SyncWrapper *syncWrapper = new SyncWrapper;
 
     bool is_valid = IOHandler::is_network_command(argc, argv);
@@ -35,23 +36,23 @@ int main(int argc, const char * argv[]) {
     cout << "is_network_command: " << networkCommandModel << endl;
     cout << "is_help_command: " << is_help_command << endl;
     
-    if(networkCommandModel){
-        ret_msg = syncWrapper->sync_with_remote("INSERT CommandModel HERE!!! Not a string!");
-        try {
-            NetworkLogic netLogic(networkCommandModel);
-            netLogic.list_remote_directory(networkCommandModel);
-        } catch (const exception &e) {
-            cerr << "Exception: " << e.what() << endl;
-        }
-    } else if(is_help_command){
+    if(networkCommandModel) {
+        ret_msg = syncWrapper->sync_with_remote(networkCommandModel);
+        if (!ret_msg.empty() && ret_msg[0] == '!') {
+            ret_msg.erase(0, 1);
+            box_color = "pink";
+        }    
+    } 
+    else if(is_help_command) {
         ret_msg = "The help page should be displayed here.";
-    } else{
+    } 
+    else {
         ret_msg = "Hmm, this is neither help or network command, maybe try the help pages?";
-        IOHandler::output_title(ret_msg, "pink");
+        box_color = "purple";
         return 0;
     }
     
-    IOHandler::output_title(ret_msg);
+    IOHandler::output_title(ret_msg, box_color);
 
     return 0;
 }

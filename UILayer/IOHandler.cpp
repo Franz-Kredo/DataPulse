@@ -38,10 +38,10 @@ bool IOHandler::file_exists(string &filepath) {
     // Calls the function with path as argument
     // If the file/directory exists at the path, stat returns 0.
     if (stat(filepath.c_str(), &sb) == 0) {
-        std::cout << "The path is valid!" << endl;
+        cout << "The path is valid!" << endl;
         return true;
     } else {
-        std::cout << "The path is invalid!" << endl;
+        cout << "The path is invalid!" << endl;
         return false;
     }
 }
@@ -179,16 +179,16 @@ bool IOHandler::is_help_command(int argc, const char * argv[]){
 //--- NEW METHOD - WITH SCROLL ---//
 void IOHandler::clear_terminal() {
     // Move cursor to top
-    std::cout << "\033[H";
+    cout << "\033[H";
     
     // Fill the screen with blank lines
     const int lines_to_print = 100;
     for (int i = 0; i < lines_to_print; ++i) {
-        std::cout << "\n";
+        cout << "\n";
     }
 
     // Move cursor back to top
-    std::cout << "\033[H";
+    cout << "\033[H";
 }
 
 void IOHandler::wait(unsigned int seconds) {
@@ -218,15 +218,15 @@ void IOHandler::output_subtitle(const string &subtitle, string color) {
 }
 // void IOHandler::write_dialoge(string dialog){
 //      for (const char c : dialog) {
-//         std::cout << c << std::flush;
-//         std::this_thread::sleep_for(std::chrono::milliseconds(10));
+//         cout << c << flush;
+//         this_thread::sleep_for(chrono::milliseconds(10));
 //     }
 // }
 
 // void IOHandler::write_story(string dialog){
 //      for (const char c : dialog) {
-//         std::cout << c << std::flush;
-//         std::this_thread::sleep_for(std::chrono::milliseconds(5));
+//         cout << c << flush;
+//         this_thread::sleep_for(chrono::milliseconds(5));
 //     }
 // }
 
@@ -353,7 +353,7 @@ string IOHandler::colorize_box(string text, string color){
     try{
         color_code = IOHandler::neon_colors.at(color); 
     }
-    catch(const std::out_of_range &e) {
+    catch(const out_of_range &e) {
         color_code = "\033[38;2;255;165;0m";
     }
 
