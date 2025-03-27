@@ -15,6 +15,7 @@ public:
 private:
     //void test_remote_file_read(SftpSessionModel *sftpSessionModel);
     void test_remote_file_read(SftpSessionModel *sftpSessionModel, CommandModel *commandModel); 
+    void test_remote_file_write(SftpSessionModel* sftpSessionModel, CommandModel* commandModel);
 };
 
 #endif // TEST_HANDLER_H
