@@ -1,4 +1,15 @@
 #include "FileModel.h"
+#include <filesystem>
+
+// #if __has_include(<filesystem>)
+//     #include <filesystem>
+//     namespace fs = std::filesystem;
+// #elif __has_include(<experimental/filesystem>)
+//     #include <experimental/filesystem>
+//     namespace fs = std::experimental::filesystem;
+// #else
+//     #error "Missing the <filesystem> header."
+// #endif
 
 
 FileModel::FileModel(const string& path, const std::string& name, std::size_t size)
@@ -15,3 +26,4 @@ void FileModel::clear_buffer() {
     this->buffer.clear();
     this->buffer.resize(0);
 }
+

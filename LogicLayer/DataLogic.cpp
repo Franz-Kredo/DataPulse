@@ -1,15 +1,15 @@
 #include "DataLogic.h"
 
 
-DataLogic::DataLogic(){
-    
+DataLogic::DataLogic(/*FileLogic *fileLogic*/){
+    // this->fileLogic = fileLogic;
 }
 
 
 //================================================================//
 //=============== PUBLIC READING & WRITING METHODS ===============//
 //================================================================//
-DataModel *DataLogic::read_data(CommandModel *commandModel){
+DataModel *DataLogic::read_data(CommandModel *commandModel){ 
     unordered_map<string, FileModel> *local_files = this->read_local(commandModel); 
     unordered_map<string, FileModel> *remote_files = this->read_remote(commandModel); 
     
@@ -46,7 +46,8 @@ PlaceholderModel *DataLogic::write_data(PlaceholderModel *dataModel){
 //===============================================================//
 //=================== PRIVATE READING METHODS ===================//
 //===============================================================//
-unordered_map<string, FileModel> *DataLogic::read_local(CommandModel *commandModel){
+
+unordered_map<string, FileModel>* DataLogic::read_local(CommandModel *commandModel){
     return nullptr;
 }
 

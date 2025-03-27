@@ -2,8 +2,8 @@
 
 
 SyncWrapper::SyncWrapper(){
-    this->dataLogic = new DataLogic;
-    
+    this->fileLogic = new FileLogic();
+    this->dataLogic = new DataLogic();
 }
 
 string SyncWrapper::sync_with_remote(CommandModel *commandModel){
@@ -23,6 +23,7 @@ string SyncWrapper::sync_with_remote(CommandModel *commandModel){
         // Try to read data locally and remotely
         DataModel *dataModel = this->dataLogic->read_data(commandModel);
         
+        dataModel = dataModel;
     } 
     catch (const runtime_error &e) {
         cerr << "!Runtime error occurred: " << e.what() << endl;

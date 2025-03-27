@@ -2,6 +2,8 @@
 #ifndef DATALOGIC_H
 #define DATALOGIC_H
 
+#include "FileLogic.h"
+
 #include "../Models/CommandModel.h"
 #include "../Models/FileModel.h"
 #include "../Models/DataModel.h"
@@ -12,7 +14,11 @@
 
 class DataLogic{
 public:
-    DataLogic();
+    // FileLogic *fileLogic;
+
+    DataLogic(FileLogic *fileLogic);
+    
+    DataLogic(/*FileLogic *fileLogic*/);
 
     //---- Methods ----//
 

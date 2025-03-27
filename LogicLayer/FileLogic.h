@@ -1,3 +1,8 @@
+
+#ifndef FILELOGIC_H
+#define FILELOGIC_H
+
+
 #include "../Models/FileModel.h"
 #include "../Models/SftpSessionModel.h"
 #include <iostream>
@@ -17,3 +22,4 @@ public:
     void write_remote(FileModel* fileModel, SftpSessionModel *sftpSessionModel);
 };
 
+#endif // FILELOGIC_H

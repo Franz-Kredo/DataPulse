@@ -34,6 +34,7 @@ public:
 	FileModel(const string& path, const std::string& name, std::size_t size);
     	~FileModel() = default;
 
+
 	string get_path() const {return this->path;}	
 	string get_name() const {return this->name;}	
 	size_t get_size() const {return this->size;}	

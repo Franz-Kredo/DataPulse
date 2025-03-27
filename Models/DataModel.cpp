@@ -9,7 +9,6 @@ void DataModel::add_local_files(unordered_map<string, FileModel> file_models){
     for (const auto& [filename, fileModel] : file_models) {
         cout << "Filename: " << fileModel.get_name() << endl;
         // Use fileModel here
-        // fileModel.do_something();  // assuming there's a method like this
     }
     
 }
