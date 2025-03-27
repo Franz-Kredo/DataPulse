@@ -18,7 +18,7 @@ FileModel::FileModel(const string& path, const std::string& name, std::size_t si
 
 	}
 
-void FileModel::populate_buffer(vector<byte> data){ 
+void FileModel::populate_buffer(const vector<byte>& data){ 
     this->buffer = data;
 }	
 void FileModel::clear_buffer() {
