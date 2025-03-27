@@ -38,7 +38,7 @@ public:
      * @param dataModel: Takes in the an instance of DataModel made from DataLogic::collect_files()
      * @returns response: A message if it has succeeded or not
      */
-    PlaceholderModel *write_data(PlaceholderModel *dataModel);
+    DataModel *write_data(DataModel *dataModel, CommandModel *commandModel);
 
 private:
     //=====================================================//
@@ -80,7 +80,7 @@ private:
      * @param commandModel: Takes in the an instance of DataModel
      * @returns ret_msg: A string message of xxx
      */
-    PlaceholderModel *write_local(PlaceholderModel *dataModel);
+    DataModel *write_local(DataModel *dataModel, CommandModel *commandModel);
 
     /*
      * @brief Uses the DataModel to write to remote directories
@@ -88,7 +88,7 @@ private:
      * @param commandModel: Takes in the an instance of DataModel
      * @returns ret_msg: A string message of xxx
      */
-    PlaceholderModel *write_remote(PlaceholderModel *dataModel);
+    DataModel *write_remote(DataModel *dataModel, CommandModel *commandModel);
 
 
     //=============================================================//
