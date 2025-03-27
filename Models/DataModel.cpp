@@ -20,23 +20,25 @@ void DataModel::print(std::ostream &os) const {
     os << "===================================================================\n\n";
 
     // Print local files
-    os << ">>> Local Files (" << local_files.size() << "):\n";
+    os << ">>> Local Files (" << this->local_files.size() << "):\n";
     os << "-------------------------------------------------------------------\n";
-    for (const auto &pair : local_files) {
+    for (const auto &pair : this->local_files) {
         const FileModel* file = pair.second;
         os << "Name       : " << file->get_name() << "\n";
         os << "Size       : " << file->get_size() << " bytes\n";
         os << "Local Path : " << file->get_path() << "\n";
+        os << "Syncable   : " << file->get_can_sync() << "\n";
         os << "-------------------------------------------------------------------\n";
     }
 
-    os << "\n>>> Remote Files (" << remote_files.size() << "):\n";
+    os << "\n>>> Remote Files (" << this->remote_files.size() << "):\n";
     os << "-------------------------------------------------------------------\n";
-    for (const auto &pair : remote_files) {
+    for (const auto &pair : this->remote_files) {
         const FileModel* file = pair.second;
         os << "Name         : " << file->get_name() << "\n";
         os << "Size         : " << file->get_size() << " bytes\n";
         os << "Remote Path  : " << file->get_remote_path() << "\n";
+        os << "Syncable     : " << file->get_can_sync() << "\n";
         os << "-------------------------------------------------------------------\n";
     }
     os << "\n\n\n";

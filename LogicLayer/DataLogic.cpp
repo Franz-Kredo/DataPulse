@@ -120,6 +120,20 @@ unordered_map<string, FileModel> *DataLogic::read_remote(CommandModel *commandMo
 }
 
 DataModel *DataLogic::mark_syncable_files(DataModel *dataModel){
+    unordered_map<string, FileModel*> local_files = dataModel->get_local_files();
+    unordered_map<string, FileModel*> remote_files = dataModel->get_remote_files();
+
+    for (const auto &pair : local_files) {
+        const string &filename = pair.first;
+        FileModel* local_file = pair.second;
+        auto remote_file_model = remote_files.find(filename);
+        if(remote_file_model != remote_files.end()) {
+            local_file->set_can_sync(true);
+            remote_file_model->second->set_can_sync(true);
+        }
+
+    }
+
     return dataModel;
 }
 
@@ -185,21 +199,6 @@ vector<FileModel*> *DataLogic::collect_remote_files(CommandModel *commandModel){
     return all_file_models;
 }
 
-// void NetworkLogic::list_remote_directory(CommandModel *commandModel) {
-//     sftp_dir dir = sftp_opendir(this->sftpSession->get(), commandModel->get_remote_path().c_str());
-//     if (!dir) throw std::runtime_error("Unable to open remote directory: " + commandModel->get_remote_path());
-
-//     sftp_attributes attrs;
-//     while ((attrs = sftp_readdir(this->sftpSession->get(), dir)) != nullptr) {
-//         if (attrs->type == SSH_FILEXFER_TYPE_REGULAR) {
-//             std::cout << "File: " << attrs->name << "\t\t\t";
-//             std::cout << "  Size: " << attrs->size << " bytes\t";
-//         }
-//         sftp_attributes_free(attrs);
-//     }
-//     sftp_closedir(dir);
-// }
-
 
 //=========================================================//
 //=================== TEMPLATED METHODS ===================//
@@ -216,10 +215,6 @@ void DataLogic::populate_local_file_model(CommandModel *commandModel){
 
 }
 
-
-// /localpath/somefile.txt
-
-// /localpath/somefile.txt.bak +a +a +a
 
 
 
