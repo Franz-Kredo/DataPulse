@@ -25,16 +25,17 @@ public:
     //---- Methods ----//
 
     /*
-     * @brief Uses the CommandModel to read from local and remote directories using internal methods
+     * @brief Takes in CommandModel and collects local and remote file info and imports it to DataModel as FileModels
      *
-     * @param commandModel: Takes in the an instance of CommandModel made from args from the terminal (mostly to get local path)
+     * @param commandModel: Takes in the an instance of CommandModel
      * @returns DataModel: 
      */
-    DataModel *read_data(CommandModel *commandModel);
+    DataModel *collect_files(CommandModel *commandModel);
+
     /*
      * @brief Uses the DataModel to write at local and remote directories using internal methods
      *
-     * @param dataModel: Takes in the an instance of DataModel made from DataLogic::read_data()
+     * @param dataModel: Takes in the an instance of DataModel made from DataLogic::collect_files()
      * @returns response: A message if it has succeeded or not
      */
     PlaceholderModel *write_data(PlaceholderModel *dataModel);
@@ -88,6 +89,15 @@ private:
      * @returns ret_msg: A string message of xxx
      */
     PlaceholderModel *write_remote(PlaceholderModel *dataModel);
+
+
+    //=============================================================//
+    //=================== PRIVATE FILES METHODS ===================//
+    //=============================================================//
+    vector<FileModel*> *collect_local_files(CommandModel *commandModel);
+    vector<FileModel*> *collect_remote_files(CommandModel *commandModel);
+
+
 
     //=========================================================//
     //=================== TEMPLATED METHODS ===================//

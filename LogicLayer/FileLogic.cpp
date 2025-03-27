@@ -12,7 +12,7 @@
 // Good chunk size, according to docs 16kb
 
 void FileLogic::read_local_data(FileModel* fileModel, size_t chunk_size){
-    cout << "=========================================================\nFileLogic::read_local_data() -> Reading the actual data\n=========================================================\n" << endl;
+    // cout << "=========================================================\nFileLogic::read_local_data() -> Reading the actual data\n=========================================================\n" << endl;
 
     if (fileModel->get_fully_read()) throw runtime_error("!Attempting to read a fully read file: " + fileModel->get_name());
     string file_name = fileModel->get_path() + "/" + fileModel->get_name(); 
@@ -113,7 +113,7 @@ void FileLogic::write_remote_data(FileModel* fileModel, SftpSessionModel *sftpSe
     string full_file_path = fileModel->get_remote_path() + "/" + fileModel->get_name();
     sftp_session sftp = sftpSessionModel->get();
 
-    cout << "|=====| FileLogic::write_remote_data() -> full_file_path: " << full_file_path << endl;
+    // cout << "|=====| FileLogic::write_remote_data() -> full_file_path: " << full_file_path << endl;
 
     // Always ensure file exists
     bool file_exists = sftp_stat(sftp, full_file_path.c_str()) != nullptr;
@@ -183,3 +183,4 @@ void FileLogic::_mark_read(FileModel *fileModel){
     if (fileModel->get_bytes_read() == fileModel->get_size())
         fileModel->set_fully_read(true);
 }
+

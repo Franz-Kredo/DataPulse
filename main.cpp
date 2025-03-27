@@ -15,20 +15,20 @@
 int main(int argc, const char * argv[]) {
     // TestHandler().test_local_file_ops();
     // return 0;
-    TestHandler().test_network_connection();
-    return 0;
+    // TestHandler().test_network_connection();
+    // return 0;
     string ret_msg;
     string box_color = "orange";
 
     SyncWrapper *syncWrapper;
 
-    bool is_valid = IOHandler::is_network_command(argc, argv);
+    // bool is_valid = IOHandler::is_network_command(argc, argv);
     CommandModel *networkCommandModel = IOHandler::is_network_command(argc, argv);
     bool is_help_command = IOHandler::is_help_command(argc, argv);
 
-    cout << "is_valid: " << is_valid << endl;
-    cout << "is_network_command: " << networkCommandModel << endl;
-    cout << "is_help_command: " << is_help_command << endl;
+    // cout << "is_valid: " << is_valid << endl;
+    // cout << "is_network_command: " << networkCommandModel << endl;
+    // cout << "is_help_command: " << is_help_command << endl;
     
     if(networkCommandModel) {
         syncWrapper = new SyncWrapper(networkCommandModel);

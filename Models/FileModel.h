@@ -67,7 +67,8 @@ public:
     /*
      * @brief Generates a FileModel based on CommandModel [NOTE: The is a default name filename for testing ]
      */
-    static FileModel *populate_file_model(CommandModel *commandModel, string filename="syncable_file.md");	
+    static FileModel *populate_local_file_model(CommandModel *commandModel, string filename);	
+    static FileModel *populate_remote_file_model(CommandModel *commandModel, string filename, size_t file_size);	
 
 private:
 };

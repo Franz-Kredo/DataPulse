@@ -27,7 +27,7 @@ string SyncWrapper::sync_with_remote(){
         this->networkLogic->list_remote_directory(this->commandModel);
         
         // Try to read data locally and remotely
-        DataModel *dataModel = this->dataLogic->read_data(this->commandModel);
+        DataModel *dataModel = this->dataLogic->collect_files(this->commandModel);
         
         dataModel = dataModel;
     } 
@@ -45,5 +45,5 @@ string SyncWrapper::sync_with_remote(){
     }
 
 
-    return "Sync succeeded";
+    return "Sync finished [doesn't mean it's successful]";
 }

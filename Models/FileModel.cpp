@@ -28,7 +28,7 @@ void FileModel::clear_buffer() {
 }
 
 
-FileModel *FileModel::populate_file_model(CommandModel *commandModel, string filename){
+FileModel *FileModel::populate_local_file_model(CommandModel *commandModel, string filename){
     string local_path = commandModel->get_local_path();
     string remote_path = commandModel->get_remote_path();
     // size_t file_size = filesystem::file_size(local_path + filename);
@@ -37,7 +37,20 @@ FileModel *FileModel::populate_file_model(CommandModel *commandModel, string fil
     FileModel *fileModel = new FileModel(local_path, filename, file_size);
     fileModel->set_remote_path(remote_path);
 
-    cout << "I------I  file_size is " << file_size <<"  I------I" << endl;
+    // cout << "I------I  file_size is " << file_size <<"  I------I" << endl;
+
+
+    return fileModel;
+}
+
+FileModel *FileModel::populate_remote_file_model(CommandModel *commandModel, string filename, size_t file_size){
+    string local_path = commandModel->get_local_path();
+    string remote_path = commandModel->get_remote_path();
+
+    FileModel *fileModel = new FileModel(local_path, filename, file_size);
+    fileModel->set_remote_path(remote_path);
+
+    // cout << "I------I  file_size is " << file_size <<"  I------I" << endl;
 
 
     return fileModel;
