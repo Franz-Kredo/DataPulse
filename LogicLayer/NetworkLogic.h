@@ -14,6 +14,12 @@ class NetworkLogic{
     NetworkLogic(CommandModel *commandModel);
 
     void list_remote_directory(CommandModel *commandModel);
+
+
+    // string sftp_read_from_remote();
+    // string sftp_write_to_remote();
+
+    // sftp_read_from_remote
     private:
     string prompt_hidden(string const &prompt);
 

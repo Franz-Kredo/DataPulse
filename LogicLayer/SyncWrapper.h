@@ -7,6 +7,7 @@
 
 #include "DataLogic.h"
 #include "NetworkLogic.h"
+#include "FileLogic.h"
 
 #include <string>
 
@@ -19,6 +20,7 @@ class SyncWrapper{
 public:
     DataLogic *dataLogic;
     NetworkLogic *networkLogic;
+    FileLogic *fileLogic;
     
     SyncWrapper();
 

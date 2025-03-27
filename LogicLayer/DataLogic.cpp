@@ -1,25 +1,31 @@
 #include "DataLogic.h"
 
 
-DataLogic::DataLogic(){
-    
+DataLogic::DataLogic(/*FileLogic *fileLogic*/){
+    // this->fileLogic = fileLogic;
 }
 
 
 //================================================================//
 //=============== PUBLIC READING & WRITING METHODS ===============//
 //================================================================//
-PlaceholderModel *DataLogic::read_data(CommandModel *commandModel){
-    PlaceholderModel *read_locally = this->read_local(commandModel); 
-    PlaceholderModel *read_remote = this->read_remote(commandModel); 
+DataModel *DataLogic::read_data(CommandModel *commandModel){ 
+    unordered_map<string, FileModel> *local_files = this->read_local(commandModel); 
+    unordered_map<string, FileModel> *remote_files = this->read_remote(commandModel); 
     
     // Throw messages to main to print more info for user
-    if (read_locally == nullptr && read_remote == nullptr) throw runtime_error("[Need DataModel and FileModel to implement fully] Error: Failed reading both local and remote files.");
-    if (read_locally == nullptr) throw runtime_error("[Need DataModel and FileModel to implement fully] Error: Failed reading local files.");
-    if (read_remote == nullptr) throw runtime_error("[Need DataModel and FileModel to implement fully] Error: Failed reading remote files.");
+    if (local_files == nullptr && remote_files == nullptr) throw runtime_error("[Need DataModel and FileModel to implement fully] Error: Failed reading both local and remote files.");
+    if (local_files == nullptr) throw runtime_error("[Need DataModel and FileModel to implement fully] Error: Failed reading local files.");
+    if (remote_files == nullptr) throw runtime_error("[Need DataModel and FileModel to implement fully] Error: Failed reading remote files.");
 
-    //TODO Here we will generate the DataModel and return it
-    return nullptr;
+    DataModel *dataModel = new DataModel();
+
+    dataModel->add_local_files(*local_files);
+    dataModel->add_remote_files(*remote_files);
+    
+    dataModel = this->mark_syncable_files(dataModel);
+    
+    return dataModel;
 }
 
 PlaceholderModel *DataLogic::write_data(PlaceholderModel *dataModel){
@@ -40,12 +46,17 @@ PlaceholderModel *DataLogic::write_data(PlaceholderModel *dataModel){
 //===============================================================//
 //=================== PRIVATE READING METHODS ===================//
 //===============================================================//
-PlaceholderModel *DataLogic::read_local(CommandModel *commandModel){
+
+unordered_map<string, FileModel>* DataLogic::read_local(CommandModel *commandModel){
     return nullptr;
 }
 
-PlaceholderModel *DataLogic::read_remote(CommandModel *commandModel){
+unordered_map<string, FileModel> *DataLogic::read_remote(CommandModel *commandModel){
     return nullptr;
+}
+
+DataModel *DataLogic::mark_syncable_files(DataModel *dataModel){
+    return dataModel;
 }
 
 
@@ -60,5 +71,6 @@ PlaceholderModel *DataLogic::write_local(PlaceholderModel *dataModel){
 PlaceholderModel *DataLogic::write_remote(PlaceholderModel *dataModel){
     return nullptr;
 }
+
 
 

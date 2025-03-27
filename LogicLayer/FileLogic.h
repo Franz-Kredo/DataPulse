@@ -1,3 +1,8 @@
+
+#ifndef FILELOGIC_H
+#define FILELOGIC_H
+
+
 #include "../Models/FileModel.h"
 #include "../Models/SftpSessionModel.h"
 #include <iostream>
@@ -22,3 +27,4 @@ private:
     void _mark_read(FileModel *fileModel);
 };
 
+#endif // FILELOGIC_H
