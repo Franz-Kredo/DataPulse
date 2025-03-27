@@ -24,7 +24,7 @@ public:
     void write_remote_data(FileModel* fileModel, SftpSessionModel *sftpSessionModel);
 private:
     size_t _get_remote_size(SftpSessionModel *sftpSessionModel, string file_name);
-    void _mark_read(FileModel *fileModel);
+    void _update_model_with_data(FileModel *fileModel, const vector<byte> &buffer);
 };
 
 #endif // FILELOGIC_H

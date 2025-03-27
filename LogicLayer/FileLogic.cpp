@@ -8,6 +8,7 @@
 #include <libssh/libssh.h>
 #include <libssh/sftp.h>
 #include <fcntl.h>
+#include <vector>
 
 // Good chunk size, according to docs 16kb
 
@@ -29,17 +30,16 @@ void FileLogic::read_local_data(FileModel* fileModel, size_t chunk_size){
     if (size != fileModel->get_size()) 
         fileModel->set_size(size);
    
-    if (chunk_size > size) chunk_size = size;
-    size_t start = fileModel->get_bytes_read();
+    size_t curr_bytes = fileModel->get_bytes_read();
+    if (chunk_size > size-curr_bytes) chunk_size = size-curr_bytes;
     
     vector<byte> buffer(chunk_size);
 
-    file.seekg(start);
+    file.seekg(curr_bytes);
     file.read(reinterpret_cast<char*>(buffer.data()), chunk_size);
     fileModel->increase_bytes_read(file.gcount());
     file.close();
-    this->_mark_read(fileModel);
-    fileModel->populate_buffer(buffer);
+    this->_update_model_with_data(fileModel, buffer);
 }
 
 void FileLogic::write_local_data(FileModel* fileModel){
@@ -67,7 +67,6 @@ void FileLogic::write_local_data(FileModel* fileModel){
 
     file.write(reinterpret_cast<const char*>(buffer.data()), buffer.size());
     file.close();
-    // this->_mark_read(fileModel);
     fileModel->clear_buffer();
 }
 
@@ -90,14 +89,14 @@ void FileLogic::read_remote_data(FileModel* fileModel, SftpSessionModel *sftpSes
     if (size != fileModel->get_size()) 
         fileModel->set_size(size);
 
-    if (chunk_size > size) chunk_size = size;
-    size_t start = fileModel->get_bytes_read();
+    size_t curr_bytes = fileModel->get_bytes_read();
+    if (chunk_size > size-curr_bytes) chunk_size = size-curr_bytes;
     
     vector<byte> buffer(chunk_size);
 
-    if (sftp_seek64(file, static_cast<uint64_t>(start)) < 0) {
+    if (sftp_seek64(file, static_cast<uint64_t>(curr_bytes)) < 0) {
         sftp_close(file);
-        throw runtime_error("Failed to seek to remote position " + to_string(start) + " in file: " + file_name);
+        throw runtime_error("Failed to seek to remote position " + to_string(curr_bytes) + " in file: " + file_name);
     }
 
     int bytes_read = sftp_read(file, reinterpret_cast<char*>(buffer.data()), chunk_size);
@@ -105,8 +104,7 @@ void FileLogic::read_remote_data(FileModel* fileModel, SftpSessionModel *sftpSes
     if(!bytes_read) cout << "Read nothing from remote file: " + file_name  << endl;
 
     fileModel->increase_bytes_read(bytes_read);
-    this->_mark_read(fileModel);
-    fileModel->populate_buffer(buffer);
+    this->_update_model_with_data(fileModel, buffer);
 }
 
 void FileLogic::write_remote_data(FileModel* fileModel, SftpSessionModel *sftpSessionModel) {
@@ -143,7 +141,6 @@ void FileLogic::write_remote_data(FileModel* fileModel, SftpSessionModel *sftpSe
         cerr << "No write perms on remote for " << fileModel->get_name() << endl;
         return;
     }
-
     fileModel->set_write_perm(true);
     
     // Seek to end (emulate append)
@@ -175,9 +172,10 @@ size_t FileLogic::_get_remote_size(SftpSessionModel *sftpSessionModel, string fu
     return size;
 }
 
-void FileLogic::_mark_read(FileModel *fileModel){
+void FileLogic::_update_model_with_data(FileModel *fileModel, const vector<byte> &buffer){
     if (!fileModel->get_buffer().empty())
         throw runtime_error("Data of file " + fileModel->get_name() + " on the local buffer is being overidden");
+    fileModel->populate_buffer(buffer);
     if (fileModel->get_bytes_read() > fileModel->get_size()) 
         throw runtime_error("We read magic from: " + fileModel->get_name());
     if (fileModel->get_bytes_read() == fileModel->get_size())
