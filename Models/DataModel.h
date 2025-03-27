@@ -4,6 +4,7 @@
 #include "FileModel.h"
 
 #include <unordered_map>
+#include <vector>
 
 
 // + local_files: unordered_map<name:string, FileModel*>
@@ -14,18 +15,18 @@
 
 
 class DataModel {
-    unordered_map<string, FileModel> local_files;
-    unordered_map<string, FileModel> remote_files;
+    unordered_map<string, FileModel*> local_files;
+    unordered_map<string, FileModel*> remote_files;
 
 public:
 	//FileModel() = default;
 	DataModel();
     	~DataModel() = default;
 
-
-    
-    void add_local_files(unordered_map<string, FileModel> file_models);
-    void add_remote_files(unordered_map<string, FileModel> file_models);
+    void add_local_files(vector<FileModel*> file_models);
+    void add_remote_files(vector<FileModel*> file_models);
+    unordered_map<string, FileModel*> get_local_files(){return this->local_files;}
+    unordered_map<string, FileModel*> get_remote_files(){return this->remote_files;}
 
 private:
 };
