@@ -1,12 +1,18 @@
 #include "SyncWrapper.h"
 
 
-SyncWrapper::SyncWrapper(){
+SyncWrapper::SyncWrapper(CommandModel *commandModel){
+    this->commandModel = commandModel;
     this->fileLogic = new FileLogic();
-    this->dataLogic = new DataLogic();
+    
+    try{ this->networkLogic = new NetworkLogic(commandModel); }
+    catch (...) { cout << "An error occurred while creating networkLogic." << endl; } 
+
+
+    this->dataLogic = new DataLogic(this->fileLogic, this->networkLogic);
 }
 
-string SyncWrapper::sync_with_remote(CommandModel *commandModel){
+string SyncWrapper::sync_with_remote(){
     // try {
     //     this->networkLogic = new NetworkLogic(commandModel);
     //     this->networkLogic->list_remote_directory(commandModel);
@@ -17,11 +23,11 @@ string SyncWrapper::sync_with_remote(CommandModel *commandModel){
 
     try {
         // Existing network logic initialization
-        this->networkLogic = new NetworkLogic(commandModel);
-        // this->networkLogic->list_remote_directory(commandModel);
-
+        // this->networkLogic = new NetworkLogic(commandModel);
+        this->networkLogic->list_remote_directory(this->commandModel);
+        
         // Try to read data locally and remotely
-        DataModel *dataModel = this->dataLogic->read_data(commandModel);
+        DataModel *dataModel = this->dataLogic->read_data(this->commandModel);
         
         dataModel = dataModel;
     } 

@@ -12,7 +12,9 @@
 // Good chunk size, according to docs 16kb
 
 void FileLogic::read_local_data(FileModel* fileModel, size_t chunk_size){
-    if (fileModel->get_fully_read()) throw runtime_error("Attempting to read a fully read file: " + fileModel->get_name());
+    cout << "=========================================================\nFileLogic::read_local_data() -> Reading the actual data\n=========================================================\n" << endl;
+
+    if (fileModel->get_fully_read()) throw runtime_error("!Attempting to read a fully read file: " + fileModel->get_name());
     string file_name = fileModel->get_path() + "/" + fileModel->get_name(); 
     //file_name = "FileLogic.h"; // should be repalace
     ifstream file(file_name, ios::binary);
@@ -65,7 +67,7 @@ void FileLogic::write_local_data(FileModel* fileModel){
 
     file.write(reinterpret_cast<const char*>(buffer.data()), buffer.size());
     file.close();
-    this->_mark_read(fileModel);
+    // this->_mark_read(fileModel);
     fileModel->clear_buffer();
 }
 
@@ -106,16 +108,21 @@ void FileLogic::read_remote_data(FileModel* fileModel, SftpSessionModel *sftpSes
     this->_mark_read(fileModel);
     fileModel->populate_buffer(buffer);
 }
+
 void FileLogic::write_remote_data(FileModel* fileModel, SftpSessionModel *sftpSessionModel) {
-    string file_name = fileModel->get_remote_path() + "/" + fileModel->get_name();
+    string full_file_path = fileModel->get_remote_path() + "/" + fileModel->get_name();
     sftp_session sftp = sftpSessionModel->get();
 
+    cout << "|=====| FileLogic::write_remote_data() -> full_file_path: " << full_file_path << endl;
+
     // Always ensure file exists
-    bool file_exists = sftp_stat(sftp, file_name.c_str()) != nullptr;
+    bool file_exists = sftp_stat(sftp, full_file_path.c_str()) != nullptr;
     if (!file_exists){
-        sftp_file create = sftp_open(sftp, file_name.c_str(), O_WRONLY | O_CREAT, S_IRWXU);
-    
+        cout << endl << "|----- FileLogic::write_remote_data() -> !file_exits -----|" << endl;
+        sftp_file create = sftp_open(sftp, full_file_path.c_str(), O_WRONLY | O_CREAT, S_IRWXU);
+        
         if (!create) {
+            cout << "|----- FileLogic::write_remote_data() -> !create -----|" << endl;
             fileModel->set_write_perm(false);
             cerr << "Failed to create remote file " << fileModel->get_name() << endl;
             return;
@@ -130,7 +137,7 @@ void FileLogic::write_remote_data(FileModel* fileModel, SftpSessionModel *sftpSe
     }
 
     // Open again to append
-    sftp_file file = sftp_open(sftp, file_name.c_str(), O_WRONLY, 0);
+    sftp_file file = sftp_open(sftp, full_file_path.c_str(), O_WRONLY, 0);
     if (!file) {
         fileModel->set_write_perm(false);
         cerr << "No write perms on remote for " << fileModel->get_name() << endl;
@@ -140,11 +147,11 @@ void FileLogic::write_remote_data(FileModel* fileModel, SftpSessionModel *sftpSe
     fileModel->set_write_perm(true);
     
     // Seek to end (emulate append)
-    size_t size = this->_get_remote_size(sftpSessionModel, file_name);
+    size_t size = this->_get_remote_size(sftpSessionModel, full_file_path);
 
     if (sftp_seek64(file, size) < 0) {
         sftp_close(file);
-        throw runtime_error("Failed to seek to end for: " + file_name);
+        throw runtime_error("Failed to seek to end for: " + full_file_path);
     }
 
     const vector<byte>& buffer = fileModel->get_buffer();
@@ -158,11 +165,10 @@ void FileLogic::write_remote_data(FileModel* fileModel, SftpSessionModel *sftpSe
     fileModel->clear_buffer();
 }
 
-
-size_t FileLogic::_get_remote_size(SftpSessionModel *sftpSessionModel, string file_name){
-    sftp_attributes attr = sftp_stat(sftpSessionModel->get(), file_name.c_str());
+size_t FileLogic::_get_remote_size(SftpSessionModel *sftpSessionModel, string full_file_path){
+    sftp_attributes attr = sftp_stat(sftpSessionModel->get(), full_file_path.c_str());
     if (!attr) {
-        throw runtime_error("Failed to stat remote file: " + file_name);
+        throw runtime_error("Failed to stat remote file: " + full_file_path);
     }
     size_t size = attr->size;
     sftp_attributes_free(attr);

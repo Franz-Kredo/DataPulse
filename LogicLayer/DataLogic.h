@@ -3,6 +3,7 @@
 #define DATALOGIC_H
 
 #include "FileLogic.h"
+#include "NetworkLogic.h"
 
 #include "../Models/CommandModel.h"
 #include "../Models/FileModel.h"
@@ -14,11 +15,12 @@
 
 class DataLogic{
 public:
-    // FileLogic *fileLogic;
+    FileLogic *fileLogic;
+    NetworkLogic *networkLogic;
 
-    DataLogic(FileLogic *fileLogic);
+    DataLogic(FileLogic *fileLogic, NetworkLogic *networkLogic);
     
-    DataLogic(/*FileLogic *fileLogic*/);
+    // DataLogic(FileLogic *fileLogic);
 
     //---- Methods ----//
 
@@ -26,7 +28,7 @@ public:
      * @brief Uses the CommandModel to read from local and remote directories using internal methods
      *
      * @param commandModel: Takes in the an instance of CommandModel made from args from the terminal (mostly to get local path)
-     * @returns DataModel: [using placeholder until FileModel is rdy] 
+     * @returns DataModel: 
      */
     DataModel *read_data(CommandModel *commandModel);
     /*
@@ -45,7 +47,7 @@ private:
      * @brief Uses the CommandModel to read from local directories, and store them in an unordered map of key:name(str) and value:FileModel
      *
      * @param commandModel: Takes in the an instance of CommandModel made from args from the terminal (mostly to get local path)
-     * @returns unordered_map<string, FileModel>:[using placeholder until FileModel is rdy] 
+     * @returns unordered_map<string, FileModel>:
      */
     unordered_map<string, FileModel> *read_local(CommandModel *commandModel);
 
@@ -53,7 +55,7 @@ private:
      * @brief Uses the CommandModel to read from remote directories via SFTP, and store them in an unordered map of key:name(str) and value:FileModel
      *
      * @param commandModel: Takes in the an instance of CommandModel made from args from the terminal
-     * @returns unordered_map<string, FileModel>: [using placeholder until FileModel is rdy] 
+     * @returns unordered_map<string, FileModel>: 
      */
     unordered_map<string, FileModel>  *read_remote(CommandModel *commandModel);    
 
@@ -87,7 +89,12 @@ private:
      */
     PlaceholderModel *write_remote(PlaceholderModel *dataModel);
 
-    
+    //=========================================================//
+    //=================== TEMPLATED METHODS ===================//
+    //=========================================================//
+
+    void populate_local_file_model(CommandModel *commandModel);
+
 
 };
 

@@ -11,6 +11,8 @@
 #include <iostream>
 #include <cstddef> // for std::byte
 
+#include "CommandModel.h"
+
 
 using namespace std;
 
@@ -61,6 +63,11 @@ public:
 
 	void populate_buffer(vector<byte> data); 
 	void clear_buffer();
+
+    /*
+     * @brief Generates a FileModel based on CommandModel [NOTE: The is a default name filename for testing ]
+     */
+    static FileModel *populate_file_model(CommandModel *commandModel, string filename="syncable_file.md");	
 
 private:
 };

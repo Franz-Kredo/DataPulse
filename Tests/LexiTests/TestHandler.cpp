@@ -34,6 +34,7 @@ void TestHandler::test_local_file_ops(){
 
     	    file.close();
 }
+
 void TestHandler::test_remote_file_read(SftpSessionModel *sftpSessionModel, CommandModel *commandModel) {
     string remote_path = commandModel->get_remote_path();
     string remote_filename = "super_duper_secret_password_storage.txt";

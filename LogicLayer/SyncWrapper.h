@@ -18,14 +18,15 @@ using namespace std;
 
 class SyncWrapper{
 public:
+    CommandModel *commandModel;
     DataLogic *dataLogic;
     NetworkLogic *networkLogic;
     FileLogic *fileLogic;
     
-    SyncWrapper();
+    SyncWrapper(CommandModel *commandModel);
 
     //---- Methods ----//
-    string sync_with_remote(CommandModel *commandModel);
+    string sync_with_remote();
 };
 
 #endif // SYNCWRAPPER_H
