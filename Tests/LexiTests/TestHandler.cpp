@@ -17,10 +17,10 @@ void TestHandler::test_local_file_ops(){
     	FileLogic logic;
     	
     	try {
-    	    	logic.read_local_data(&fileModel, 16); // Read 16 bytes
+    	    	logic.read_local_data(&fileModel, 160); // Read 16 bytes
     	    	logic.write_local_data(&fileModel);    // Write buffer to "test_write_to.txt"
-    	    	logic.read_local_data(&fileModel, 8); // Read 16 bytes
-    	    	logic.write_local_data(&fileModel);    // Write buffer to "test_write_to.txt"
+    	    	//logic.read_local_data(&fileModel, 8); // Read 16 bytes
+    	    	//logic.write_local_data(&fileModel);    // Write buffer to "test_write_to.txt"
     	    	cout << "Read and write completed successfully, catting outp" << endl;
     	} catch (const exception& ex) {
     	    	cerr << "Exception: " << ex.what() << endl;
@@ -79,7 +79,7 @@ void TestHandler::test_remote_file_write(SftpSessionModel* sftpSessionModel, Com
     fileModel.set_name(remote_filename); // we're writing under a different name on remote
     FileLogic logic;
     try {
-        logic.read_local_data(&fileModel, 8); // Read from local
+        logic.read_local_data(&fileModel, 150); // Read from local
         logic.write_remote_data(&fileModel, sftpSessionModel); // Write to remote
         cout << "Write to remote succeeded. Verifying contents..." << endl;
         // Re-read remote to confirm write
