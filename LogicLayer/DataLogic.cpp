@@ -21,8 +21,8 @@ DataModel *DataLogic::read_data(CommandModel *commandModel){
 
     DataModel *dataModel = new DataModel();
 
-    dataModel->add_local_files(*local_files);
-    dataModel->add_remote_files(*remote_files);
+    //dataModel->add_local_files(*local_files);
+    //dataModel->add_remote_files(*remote_files);
     
     dataModel = this->mark_syncable_files(dataModel);
     

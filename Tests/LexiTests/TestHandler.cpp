@@ -96,12 +96,12 @@ void TestHandler::test_remote_file_write(SftpSessionModel* sftpSessionModel, Com
 }
 
 void TestHandler::test_network_connection(){
-           CommandModel command;
-            command.set_host("sty.frostbyte.is");
-            command.set_username("alexanderme22");
-            command.set_local_path("/home/lexman/");
-            command.set_remote_path("/home/alexanderme22");
-            command.set_priv_key_path("/home/lexman/.ssh/sty1_server");
+    CommandModel command;
+    command.set_host("sty.frostbyte.is");
+    command.set_username("alexanderme22");
+    command.set_local_path("/home/lexman/");
+    command.set_remote_path("/home/alexanderme22");
+    command.set_priv_key_path("/home/lexman/.ssh/sty1_server");
 
     try {
         NetworkLogic *netLogic = new NetworkLogic(&command);
