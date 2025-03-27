@@ -3,6 +3,7 @@
 #define DATALOGIC_H
 
 #include "FileLogic.h"
+#include "NetworkLogic.h"
 
 #include "../Models/CommandModel.h"
 #include "../Models/FileModel.h"
@@ -14,28 +15,30 @@
 
 class DataLogic{
 public:
-    // FileLogic *fileLogic;
+    FileLogic *fileLogic;
+    NetworkLogic *networkLogic;
 
-    DataLogic(FileLogic *fileLogic);
+    DataLogic(FileLogic *fileLogic, NetworkLogic *networkLogic);
     
-    DataLogic(/*FileLogic *fileLogic*/);
+    // DataLogic(FileLogic *fileLogic);
 
     //---- Methods ----//
 
     /*
-     * @brief Uses the CommandModel to read from local and remote directories using internal methods
+     * @brief Takes in CommandModel and collects local and remote file info and imports it to DataModel as FileModels
      *
-     * @param commandModel: Takes in the an instance of CommandModel made from args from the terminal (mostly to get local path)
-     * @returns DataModel: [using placeholder until FileModel is rdy] 
+     * @param commandModel: Takes in the an instance of CommandModel
+     * @returns DataModel: 
      */
-    DataModel *read_data(CommandModel *commandModel);
+    DataModel *collect_files(CommandModel *commandModel);
+
     /*
      * @brief Uses the DataModel to write at local and remote directories using internal methods
      *
-     * @param dataModel: Takes in the an instance of DataModel made from DataLogic::read_data()
+     * @param dataModel: Takes in the an instance of DataModel made from DataLogic::collect_files()
      * @returns response: A message if it has succeeded or not
      */
-    PlaceholderModel *write_data(PlaceholderModel *dataModel);
+    DataModel *write_data(DataModel *dataModel, CommandModel *commandModel);
 
 private:
     //=====================================================//
@@ -45,7 +48,7 @@ private:
      * @brief Uses the CommandModel to read from local directories, and store them in an unordered map of key:name(str) and value:FileModel
      *
      * @param commandModel: Takes in the an instance of CommandModel made from args from the terminal (mostly to get local path)
-     * @returns unordered_map<string, FileModel>:[using placeholder until FileModel is rdy] 
+     * @returns unordered_map<string, FileModel>:
      */
     unordered_map<string, FileModel> *read_local(CommandModel *commandModel);
 
@@ -53,7 +56,7 @@ private:
      * @brief Uses the CommandModel to read from remote directories via SFTP, and store them in an unordered map of key:name(str) and value:FileModel
      *
      * @param commandModel: Takes in the an instance of CommandModel made from args from the terminal
-     * @returns unordered_map<string, FileModel>: [using placeholder until FileModel is rdy] 
+     * @returns unordered_map<string, FileModel>: 
      */
     unordered_map<string, FileModel>  *read_remote(CommandModel *commandModel);    
 
@@ -63,7 +66,7 @@ private:
      * @param dataModel: Takes in the an instance of DataModel made from args from the terminal
      * @returns DataModel: [using placeholder until FileModel is rdy]
      */
-    DataModel *mark_syncable_files(DataModel *dataModel);
+    DataModel *mark_syncable_files(DataModel *dataModel, CommandModel *commandModel);
 
 
 
@@ -77,7 +80,7 @@ private:
      * @param commandModel: Takes in the an instance of DataModel
      * @returns ret_msg: A string message of xxx
      */
-    PlaceholderModel *write_local(PlaceholderModel *dataModel);
+    DataModel *write_local(DataModel *dataModel, CommandModel *commandModel);
 
     /*
      * @brief Uses the DataModel to write to remote directories
@@ -85,9 +88,23 @@ private:
      * @param commandModel: Takes in the an instance of DataModel
      * @returns ret_msg: A string message of xxx
      */
-    PlaceholderModel *write_remote(PlaceholderModel *dataModel);
+    DataModel *write_remote(DataModel *dataModel, CommandModel *commandModel);
 
-    
+
+    //=============================================================//
+    //=================== PRIVATE FILES METHODS ===================//
+    //=============================================================//
+    vector<FileModel*> *collect_local_files(CommandModel *commandModel);
+    vector<FileModel*> *collect_remote_files(CommandModel *commandModel);
+
+
+
+    //=========================================================//
+    //=================== TEMPLATED METHODS ===================//
+    //=========================================================//
+
+    void populate_local_file_model(CommandModel *commandModel);
+
 
 };
 

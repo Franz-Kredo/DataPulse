@@ -38,7 +38,6 @@ bool IOHandler::file_exists(string &filepath) {
     // Calls the function with path as argument
     // If the file/directory exists at the path, stat returns 0.
     if (stat(filepath.c_str(), &sb) == 0) {
-        cout << "The path is valid!" << endl;
         return true;
     } else {
         cout << "The path is invalid!" << endl;

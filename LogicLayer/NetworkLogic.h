@@ -11,6 +11,8 @@ using std::string;
 class NetworkLogic{
     public:
     SftpSessionModel *sftpSession;
+
+    
     NetworkLogic(CommandModel *commandModel);
 
     void list_remote_directory(CommandModel *commandModel);
