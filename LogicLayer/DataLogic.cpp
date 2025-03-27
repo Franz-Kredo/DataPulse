@@ -33,7 +33,7 @@ DataModel *DataLogic::collect_files(CommandModel *commandModel){
     dataModel->add_remote_files(remote_files);
     
     // cout << "Mark syncable files to DataModel" << endl;
-    dataModel = this->mark_syncable_files(dataModel);
+    dataModel = this->mark_syncable_files(dataModel, commandModel);
 
     
     //--- Printing Data Model Pretty! ---//
@@ -119,21 +119,37 @@ unordered_map<string, FileModel> *DataLogic::read_remote(CommandModel *commandMo
     return nullptr;
 }
 
-DataModel *DataLogic::mark_syncable_files(DataModel *dataModel){
-    unordered_map<string, FileModel*> local_files = dataModel->get_local_files();
-    unordered_map<string, FileModel*> remote_files = dataModel->get_remote_files();
+DataModel *DataLogic::mark_syncable_files(DataModel *dataModel, CommandModel *commandModel){
+    bool is_merge = commandModel->get_merge();
 
-    for (const auto &pair : local_files) {
-        const string &filename = pair.first;
-        FileModel* local_file = pair.second;
-        auto remote_file_model = remote_files.find(filename);
-        if(remote_file_model != remote_files.end()) {
-            local_file->set_can_sync(true);
-            remote_file_model->second->set_can_sync(true);
+    if(!is_merge){
+        unordered_map<string, FileModel*> local_files = dataModel->get_local_files();
+        unordered_map<string, FileModel*> remote_files = dataModel->get_remote_files();
+    
+        for (const auto &pair : local_files) {
+            const string &filename = pair.first;
+            FileModel* local_file = pair.second;
+            auto remote_file_model = remote_files.find(filename);
+            if(remote_file_model == remote_files.end()) {
+                local_file->set_can_sync(true);
+            }
         }
-
+        //-------- MIGHT NEET TO DO THE SAME FOR REMOTE->LOCAL but I dont know how --------//
+        for (const auto &pair : remote_files) {
+            const string &filename = pair.first;
+            cout << filename << endl;
+            cout << filename << endl;
+            cout << filename << endl;
+            FileModel* remote_file = pair.second;
+            auto local_file_model = local_files.find(filename);
+            if(local_file_model == local_files.end()) {
+                remote_file->set_can_sync(true);
+            }
+        }
+        return dataModel;
     }
 
+    cout << "DataLogic::mark_syncable_files() -> You just tried to mark syncable files with merge, this might not be implemented yet..." << endl;
     return dataModel;
 }
 

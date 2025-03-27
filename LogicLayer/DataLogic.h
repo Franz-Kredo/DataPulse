@@ -66,7 +66,7 @@ private:
      * @param dataModel: Takes in the an instance of DataModel made from args from the terminal
      * @returns DataModel: [using placeholder until FileModel is rdy]
      */
-    DataModel *mark_syncable_files(DataModel *dataModel);
+    DataModel *mark_syncable_files(DataModel *dataModel, CommandModel *commandModel);
 
 
 
