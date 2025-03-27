@@ -36,7 +36,7 @@ void TestHandler::test_local_file_ops(){
 }
 
 void TestHandler::test_remote_file_read(SftpSessionModel *sftpSessionModel, CommandModel *commandModel) {
-    string remote_path = commandModel->get_remote_path();
+    string remote_path = commandModel->get_remote_dir_path();
     string remote_filename = "super_duper_secret_password_storage.txt";
     string dummy_size_reference = remote_path + "/" +remote_filename;
 	cout << dummy_size_reference << endl;
@@ -50,7 +50,7 @@ void TestHandler::test_remote_file_read(SftpSessionModel *sftpSessionModel, Comm
     sftp_attributes_free(attr);
 
     FileModel fileModel("/home/lexman/ru_s25/forc/DataPulse", remote_filename, test_size);
-    fileModel.set_remote_path(remote_path);
+    fileModel.set_remote_dir_path(remote_path);
     FileLogic logic;
 
     try {
@@ -72,11 +72,11 @@ void TestHandler::test_remote_file_read(SftpSessionModel *sftpSessionModel, Comm
 void TestHandler::test_remote_file_write(SftpSessionModel* sftpSessionModel, CommandModel* commandModel) {
     string local_path = "/home/lexman/ru_s25/forc/DataPulse/Tests/LexiTests";
     string local_filename = "test.txt";
-    string remote_path = commandModel->get_remote_path();
+    string remote_path = commandModel->get_remote_dir_path();
     string remote_filename = "test.txt";
     size_t test_size = filesystem::file_size(local_path + "/" + local_filename);
     FileModel fileModel(local_path, local_filename, test_size);
-    fileModel.set_remote_path(remote_path);
+    fileModel.set_remote_dir_path(remote_path);
     fileModel.set_name(remote_filename); // we're writing under a different name on remote
     FileLogic logic;
     try {

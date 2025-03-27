@@ -47,10 +47,10 @@ DataModel *DataLogic::write_data(DataModel *dataModel, CommandModel *commandMode
     if (dataModel == nullptr) throw runtime_error("!Error: dataModel is empty in DataLogic::write_data().");
     
     dataModel = this->write_local(dataModel, commandModel); 
-    if (dataModel == nullptr) throw runtime_error("Error: Failed writing to local files.");
+    if (dataModel == nullptr) throw runtime_error("!Error: Failed writing to local files.");
     
     dataModel = this->write_remote(dataModel, commandModel); 
-    if (dataModel == nullptr) throw runtime_error("Error: Failed writing to remote files.");
+    if (dataModel == nullptr) throw runtime_error("!Error: Failed writing to remote files.");
     
 
     
@@ -77,18 +77,18 @@ DataModel *DataLogic::mark_syncable_files(DataModel *dataModel, CommandModel *co
     if(!is_merge){
         //--- Going through all local files to mark files that don't exist remotely ---//
         for (const auto &pair : local_files) {
-            const string &filename = pair.first;
+            const string &relative_path = pair.first;
             FileModel* local_file = pair.second;
-            auto remote_file_model = remote_files.find(filename);
+            auto remote_file_model = remote_files.find(relative_path);
             if(remote_file_model == remote_files.end()) {
                 local_file->set_can_sync(true);
             }
         }
         //--- Going through all remote files to mark files that don't exist locally ---//
         for (const auto &pair : remote_files) {
-            const string &filename = pair.first;
+            const string &relative_path = pair.first;
             FileModel* remote_file = pair.second;
-            auto local_file_model = local_files.find(filename);
+            auto local_file_model = local_files.find(relative_path);
             if(local_file_model == local_files.end()) {
                 remote_file->set_can_sync(true);
             }
@@ -121,13 +121,13 @@ DataModel *DataLogic::write_local(DataModel *dataModel, CommandModel *commandMod
     // Create logic for non-merge sync
     if(!commandModel->get_merge()){
         for (const auto &pair : remote_files) {
-            const string &filename = pair.first;
+            const string &relative_path = pair.first;
             FileModel* local_file = pair.second;
             const bool can_sync = local_file->get_can_sync();
             if(!can_sync)
                 continue;
     
-            auto local_file_model = local_files.find(filename);
+            auto local_file_model = local_files.find(relative_path);
 
             // If the file is not found locally (which we want), then write it locally
             if(local_file_model == local_files.end()) {
@@ -157,13 +157,13 @@ DataModel *DataLogic::write_remote(DataModel *dataModel, CommandModel *commandMo
     // Create logic for non-merge sync
     if(!commandModel->get_merge()){
         for (const auto &pair : local_files) {
-            const string &filename = pair.first;
+            const string &relative_path = pair.first;
             FileModel* local_file = pair.second;
             const bool can_sync = local_file->get_can_sync();
             if(!can_sync)
                 continue;
     
-            auto remote_file_model = remote_files.find(filename);
+            auto remote_file_model = remote_files.find(relative_path);
             // If the file is not found on remote (which we want), then write it on remote
             if(remote_file_model == remote_files.end()) {
                 while(!local_file->get_fully_read()){
@@ -190,13 +190,14 @@ vector<FileModel*> *DataLogic::collect_local_files(CommandModel *commandModel){
     vector<FileModel*> *all_file_models = new vector<FileModel*>();;
     cout << "\n\n-=-=-=-=-= DataLogic::get_all_local_files -=-=-=-=-=" << endl;
 
-    string local_path = commandModel->get_local_path();
+    string local_path = commandModel->get_local_dir_path();
     for (const auto & entry : filesystem::directory_iterator(local_path)){
-        string filename = entry.path().filename();
-        FileModel *fileModel = FileModel::populate_local_file_model(commandModel, filename);
-        std::cout << entry.path().filename() << std::endl;
-        // std::cout << entry.path().filename() << std::endl;
-        // std::cout << entry.path().filename() << std::endl;
+        // string relative_path = entry.path().filename(); // Outdated, we are now using relative_path
+        string relative_path = filesystem::relative(entry.path(), local_path).string();
+        cout << "---- RELATIVE PATH 1: "<< relative_path <<" ----";
+        FileModel *fileModel = FileModel::populate_local_file_model(commandModel, relative_path);
+        std::cout << relative_path << std::endl; // Outdated, we are now using relative_path
+
         all_file_models->push_back(fileModel);
     }
 
@@ -207,18 +208,21 @@ vector<FileModel*> *DataLogic::collect_remote_files(CommandModel *commandModel){
     vector<FileModel*> *all_file_models = new vector<FileModel*>();;
     cout << "\n\n-=-=-=-=-= DataLogic::get_all_remote_files -=-=-=-=-=" << endl;
 
-    string remote_path = commandModel->get_remote_path();
+    string remote_path = commandModel->get_remote_dir_path();
     
-    sftp_dir dir = sftp_opendir(this->networkLogic->sftpSession->get(), commandModel->get_remote_path().c_str());
-    if (!dir) throw std::runtime_error("Unable to open remote directory: " + commandModel->get_remote_path());
+    sftp_dir dir = sftp_opendir(this->networkLogic->sftpSession->get(), commandModel->get_remote_dir_path().c_str());
+
+    if (!dir) throw std::runtime_error("Unable to open remote directory: " + commandModel->get_remote_dir_path());
 
     sftp_attributes attrs;
     while ((attrs = sftp_readdir(this->networkLogic->sftpSession->get(), dir)) != nullptr) {
         if (attrs->type == SSH_FILEXFER_TYPE_REGULAR) {
-            // FileModel::populate_remote_file_model(commandModel, attrs->size, attrs->name);
+            string relative_path = attrs->name; // This should give us the relative path
+            cout << "---- RELATIVE PATH 2: "<< relative_path <<" ----" << endl;
+        // FileModel::populate_remote_file_model(commandModel, attrs->size, attrs->name);
             // std::cout << "File: " << attrs->name << "\n"; // std::cout << "  Size: " << attrs->size << " bytes\n\n";
-            std::cout << "File: " << attrs->name << "\n"; 
-            FileModel *fileModel = FileModel::populate_remote_file_model(commandModel, attrs->name, attrs->size);
+            std::cout << "File's relative path: " << relative_path << endl; 
+            FileModel *fileModel = FileModel::populate_remote_file_model(commandModel, relative_path, attrs->size);
             all_file_models->push_back(fileModel);
         }
         sftp_attributes_free(attrs);
@@ -226,22 +230,6 @@ vector<FileModel*> *DataLogic::collect_remote_files(CommandModel *commandModel){
     sftp_closedir(dir);
 
     return all_file_models;
-}
-
-
-//=========================================================//
-//=================== TEMPLATED METHODS ===================//
-//=========================================================//
-
-void DataLogic::populate_local_file_model(CommandModel *commandModel){
-    string path = filesystem::current_path();
-        path+="/SyncTester/";
-
-    string test_filename = "syncable_file.nice";
-    size_t test_size = filesystem::file_size(path + test_filename);
-
-    FileModel fileModel(path, test_filename, test_size);
-
 }
 
 

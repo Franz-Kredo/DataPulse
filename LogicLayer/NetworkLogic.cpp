@@ -31,8 +31,8 @@ NetworkLogic::NetworkLogic(CommandModel *commandModel)
 
 // Testing func
 void NetworkLogic::list_remote_directory(CommandModel *commandModel) {
-    sftp_dir dir = sftp_opendir(this->sftpSession->get(), commandModel->get_remote_path().c_str());
-    if (!dir) throw std::runtime_error("Unable to open remote directory: " + commandModel->get_remote_path());
+    sftp_dir dir = sftp_opendir(this->sftpSession->get(), commandModel->get_remote_dir_path().c_str());
+    if (!dir) throw std::runtime_error("Unable to open remote directory: " + commandModel->get_remote_dir_path());
 
     sftp_attributes attrs;
     while ((attrs = sftp_readdir(this->sftpSession->get(), dir)) != nullptr) {

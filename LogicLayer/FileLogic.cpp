@@ -15,13 +15,13 @@
 void FileLogic::read_local_data(FileModel* fileModel, size_t chunk_size){
     // cout << "=========================================================\nFileLogic::read_local_data() -> Reading the actual data\n=========================================================\n" << endl;
 
-    if (fileModel->get_fully_read()) throw runtime_error("!Attempting to read a fully read file: " + fileModel->get_name());
-    string file_name = fileModel->get_path() + "/" + fileModel->get_name(); 
+    if (fileModel->get_fully_read()) throw runtime_error("!Attempting to read a fully read file: " + fileModel->get_relative_path());
+    string file_name = fileModel->get_path() + "/" + fileModel->get_relative_path(); 
     //file_name = "FileLogic.h"; // should be repalace
     ifstream file(file_name, ios::binary);
     if (!file.is_open()){
         fileModel->set_read_perm(false);
-        cout << "No read perms on local: " + fileModel->get_name() << endl;
+        cout << "No read perms on local: " + fileModel->get_relative_path() << endl;
         return;
     }
     fileModel->set_read_perm(true);
@@ -43,7 +43,7 @@ void FileLogic::read_local_data(FileModel* fileModel, size_t chunk_size){
 }
 
 void FileLogic::write_local_data(FileModel* fileModel){
-    string file_name = fileModel->get_path() + "/" + fileModel->get_name(); 
+    string file_name = fileModel->get_path() + "/" + fileModel->get_relative_path(); 
     
     if (!filesystem::exists(file_name)){
         ofstream create(file_name, ios::binary);
@@ -51,14 +51,14 @@ void FileLogic::write_local_data(FileModel* fileModel){
     }
 
     if (fileModel->get_buffer().size() == 0){
-        cout << "Skipping write on an empty buffer for:" + fileModel->get_name() << endl;
+        cout << "Skipping write on an empty buffer for:" + fileModel->get_relative_path() << endl;
         return;
     }
 
     ofstream file(file_name, ios::binary | ios::app);
     if (!file.is_open()){
         fileModel->set_write_perm(false);
-        cout << "No write perms on " + fileModel->get_name() << endl;
+        cout << "No write perms on " + fileModel->get_relative_path() << endl;
         return;
     }
     fileModel->set_write_perm(true);
@@ -72,16 +72,16 @@ void FileLogic::write_local_data(FileModel* fileModel){
 
 void FileLogic::read_remote_data(FileModel* fileModel, SftpSessionModel *sftpSessionModel, size_t chunk_size){
     if (fileModel->get_fully_read()) 
-        throw runtime_error("Attempting to read a fully read file: " + fileModel->get_name());
+        throw runtime_error("Attempting to read a fully read file: " + fileModel->get_relative_path());
 
     sftp_session sftp = sftpSessionModel->get();
-    string file_name = fileModel->get_remote_path() + "/" + fileModel->get_name(); 
+    string file_name = fileModel->get_remote_path() + "/" + fileModel->get_relative_path(); 
     int access_type = O_RDONLY;
 
     sftp_file file = sftp_open(sftp, file_name.c_str(), access_type, 0);
     if (!file){
         fileModel->set_read_perm(false);
-        cout << "No read perms on remote: " + fileModel->get_name() << endl;
+        cout << "No read perms on remote: " + fileModel->get_relative_path() << endl;
         return;
     }
     fileModel->set_read_perm(true);
@@ -108,7 +108,7 @@ void FileLogic::read_remote_data(FileModel* fileModel, SftpSessionModel *sftpSes
 }
 
 void FileLogic::write_remote_data(FileModel* fileModel, SftpSessionModel *sftpSessionModel) {
-    string full_file_path = fileModel->get_remote_path() + "/" + fileModel->get_name();
+    string full_file_path = fileModel->get_remote_path() + "/" + fileModel->get_relative_path();
     sftp_session sftp = sftpSessionModel->get();
 
     // cout << "|=====| FileLogic::write_remote_data() -> full_file_path: " << full_file_path << endl;
@@ -122,7 +122,7 @@ void FileLogic::write_remote_data(FileModel* fileModel, SftpSessionModel *sftpSe
         if (!create) {
             cout << "|----- FileLogic::write_remote_data() -> !create -----|" << endl;
             fileModel->set_write_perm(false);
-            cerr << "Failed to create remote file " << fileModel->get_name() << endl;
+            cerr << "Failed to create remote file " << fileModel->get_relative_path() << endl;
             return;
         }
         // Close after ensuring existence
@@ -130,7 +130,7 @@ void FileLogic::write_remote_data(FileModel* fileModel, SftpSessionModel *sftpSe
     }
     // If there's nothing to write, stop here
     if (fileModel->get_buffer().empty()) {
-        cout << "Skipping remote write on an empty buffer for: " << fileModel->get_name() << endl;
+        cout << "Skipping remote write on an empty buffer for: " << fileModel->get_relative_path() << endl;
         return;
     }
 
@@ -138,7 +138,7 @@ void FileLogic::write_remote_data(FileModel* fileModel, SftpSessionModel *sftpSe
     sftp_file file = sftp_open(sftp, full_file_path.c_str(), O_WRONLY, 0);
     if (!file) {
         fileModel->set_write_perm(false);
-        cerr << "No write perms on remote for " << fileModel->get_name() << endl;
+        cerr << "No write perms on remote for " << fileModel->get_relative_path() << endl;
         return;
     }
     fileModel->set_write_perm(true);
@@ -157,7 +157,7 @@ void FileLogic::write_remote_data(FileModel* fileModel, SftpSessionModel *sftpSe
     sftp_close(file);
 
     if (bytes_written != static_cast<int>(buffer.size()))
-        throw runtime_error("Incomplete remote write to: " + fileModel->get_name());
+        throw runtime_error("Incomplete remote write to: " + fileModel->get_relative_path());
 
     fileModel->clear_buffer();
 }
@@ -174,10 +174,10 @@ size_t FileLogic::_get_remote_size(SftpSessionModel *sftpSessionModel, string fu
 
 void FileLogic::_update_model_with_data(FileModel *fileModel, const vector<byte> &buffer){
     if (!fileModel->get_buffer().empty())
-        throw runtime_error("Data of file " + fileModel->get_name() + " on the local buffer is being overidden");
+        throw runtime_error("Data of file " + fileModel->get_relative_path() + " on the local buffer is being overidden");
     fileModel->populate_buffer(buffer);
     if (fileModel->get_bytes_read() > fileModel->get_size()) 
-        throw runtime_error("We read magic from: " + fileModel->get_name());
+        throw runtime_error("We read magic from: " + fileModel->get_relative_path());
     if (fileModel->get_bytes_read() == fileModel->get_size())
         fileModel->set_fully_read(true);
 }

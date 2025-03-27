@@ -28,8 +28,8 @@ public:
 
 	string get_host() const {return this->host;}	
 	string get_username() const {return this->username;}	
-	string get_remote_path() const {return this->remote_path;}	
-	string get_local_path() const {return this->local_path;}	
+	string get_remote_dir_path() const {return this->remote_path;}	
+	string get_local_dir_path() const {return this->local_path;}	
 	string get_priv_key_path() const {return this->priv_key_path;}	
 	bool get_merge() const {return this->merge;}	
 

@@ -10,6 +10,7 @@
 #include <libssh/sftp.h>
 #include <iostream>
 #include <cstddef> // for std::byte
+#include <filesystem>
 
 #include "CommandModel.h"
 
@@ -23,7 +24,7 @@ using std::byte;
 class FileModel {
 	string path;
 	string remote_path;
-	string name;
+    string relative_file_path;
 	size_t size;
 	bool read_perm;
 	bool write_perm;
@@ -34,13 +35,16 @@ class FileModel {
 
 public:
 	//FileModel() = default;
-	FileModel(const string& path, const std::string& name, std::size_t size);
+	FileModel(const string& path, const std::string& relative_file_path, std::size_t size);
     	~FileModel() = default;
 
 
+	string get_relative_path() const {return this->relative_file_path;}
 	string get_path() const {return this->path;}	
 	string get_remote_path() const {return this->remote_path;}	
-	string get_name() const {return this->name;}	
+	// string get_name() const {return this->name;}	
+	// string get_name() const {return filesystem::path(this->relative_file_path).filename().string();} // Collect the name using the relative path
+    
 	size_t get_size() const {return this->size;}	
 	bool get_read_perm() const {return this->read_perm;}	
 	bool get_write_perm() const {return this->write_perm;}	
@@ -51,8 +55,20 @@ public:
 
 
 	void set_path(string path) { this->path = path;}	
-	void set_remote_path(string path) { this->remote_path = path;}	
-	void set_name(string name)  { this->name = name;}	
+	void set_remote_dir_path(string path) { this->remote_path = path;}	
+	// void set_name(string name)  { this->name = name;}	
+    
+    // New set_name() method that replaces the file name portion in relative_file_path
+    void set_name(const string& new_name) {
+        size_t pos = relative_file_path.find_last_of("/\\");
+        if (pos != string::npos) {
+            // Preserve the directory structure and replace the file name
+            relative_file_path = relative_file_path.substr(0, pos + 1) + new_name;
+        } else {
+            relative_file_path = new_name;
+        }
+    }
+    
 	void set_size(size_t size)  { this->size = size;}	
 	void set_read_perm(bool perm)  { this->read_perm = perm;}	
 	void set_write_perm(bool perm)  { this->write_perm = perm;}	
@@ -65,10 +81,10 @@ public:
 	void clear_buffer();
 
     /*
-     * @brief Generates a FileModel based on CommandModel [NOTE: The is a default name filename for testing ]
+     * @brief Generates a FileModel based on CommandModel 
      */
-    static FileModel *populate_local_file_model(CommandModel *commandModel, string filename);	
-    static FileModel *populate_remote_file_model(CommandModel *commandModel, string filename, size_t file_size);	
+    static FileModel *populate_local_file_model(CommandModel *commandModel, string relative_file_path);	
+    static FileModel *populate_remote_file_model(CommandModel *commandModel, string relative_file_path, size_t file_size);	
 
 private:
 };
