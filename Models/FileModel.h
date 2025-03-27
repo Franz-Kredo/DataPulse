@@ -20,6 +20,7 @@ using std::byte;
 
 class FileModel {
 	string path;
+	string remote_path;
 	string name;
 	size_t size;
 	bool read_perm;
@@ -36,6 +37,7 @@ public:
 
 
 	string get_path() const {return this->path;}	
+	string get_remote_path() const {return this->remote_path;}	
 	string get_name() const {return this->name;}	
 	size_t get_size() const {return this->size;}	
 	bool get_read_perm() const {return this->read_perm;}	
@@ -47,6 +49,7 @@ public:
 
 
 	void set_path(string path) { this->path = path;}	
+	void set_remote_path(string path) { this->remote_path = path;}	
 	void set_name(string name)  { this->name = name;}	
 	void set_size(size_t size)  { this->size = size;}	
 	void set_read_perm(bool perm)  { this->read_perm = perm;}	

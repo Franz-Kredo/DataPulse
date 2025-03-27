@@ -12,30 +12,10 @@
 
 
 
-
-
-
-
-
-void test_network_connection(){
-           CommandModel command;
-            command.set_host("sty.frostbyte.is");
-            command.set_username("alexanderme22");
-            command.set_local_path("/home/lexman/");
-            command.set_remote_path("/home/alexanderme22");
-            command.set_priv_key_path("/home/lexman/.ssh/sty1_server");
-
-    try {
-        NetworkLogic netLogic(&command);
-        netLogic.list_remote_directory(&command);
-    } catch (const exception &e) {
-        cerr << "Exception: " << e.what() << endl;
-    }
-}
-
-
 int main(int argc, const char * argv[]) {
     // TestHandler().test_local_file_ops();
+    // return 0;
+    // TestHandler().test_network_connection();
     // return 0;
     string ret_msg;
     string box_color = "orange";
