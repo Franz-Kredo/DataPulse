@@ -27,6 +27,13 @@ public:
     
     SyncWrapper(CommandModel *commandModel);
 
+    SyncWrapper::~SyncWrapper() {
+        delete fileLogic;
+        delete networkLogic;
+        delete dataLogic;
+        delete conflictLogic;
+    }
+
     //---- Methods ----//
 
     /**
