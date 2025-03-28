@@ -20,9 +20,9 @@ DataModel *DataLogic::collect_files(CommandModel *commandModel){
 
     cout << "After collecting FileModel for each file both local and remote" << endl;
     // Throw messages to main to print more info for user
-    if (local_files == nullptr && remote_files == nullptr) throw runtime_error("Error: Failed reading both local and remote files.");
-    if (local_files == nullptr) throw runtime_error("Error: Failed reading local files.");
-    if (remote_files == nullptr) throw runtime_error("Error: Failed reading remote files.");
+    if (local_files == nullptr && remote_files == nullptr) throw runtime_error("!Error: Failed reading both local and remote files.");
+    if (local_files == nullptr) throw runtime_error("!Error: Failed reading local files.");
+    if (remote_files == nullptr) throw runtime_error("!Error: Failed reading remote files.");
 
     cout << "Creating DataModel" << endl;
     DataModel *dataModel = new DataModel();
@@ -147,8 +147,6 @@ DataModel *DataLogic::write_local(DataModel *dataModel, CommandModel *commandMod
 
 
 DataModel *DataLogic::write_remote(DataModel *dataModel, CommandModel *commandModel){
-    cout << "DataLogic::write_remote() was called" << endl;
-
     size_t chunk_size = 8;
     
     unordered_map<string, FileModel *> local_files = dataModel->get_local_files();
@@ -188,7 +186,7 @@ DataModel *DataLogic::write_remote(DataModel *dataModel, CommandModel *commandMo
 
 vector<FileModel*> *DataLogic::collect_local_files(CommandModel *commandModel){
     vector<FileModel*> *all_file_models = new vector<FileModel*>();;
-    cout << "\n\n-=-=-=-=-= DataLogic::get_all_local_files -=-=-=-=-=" << endl;
+    // cout << "\n\n-=-=-=-=-= DataLogic::get_all_local_files -=-=-=-=-=" << endl;
 
     string local_path = commandModel->get_local_dir_path();
     // for (const auto & entry : filesystem::directory_iterator(local_path)){
@@ -197,9 +195,7 @@ vector<FileModel*> *DataLogic::collect_local_files(CommandModel *commandModel){
             continue; // Skip directories or other non-file entries
 
         string relative_path = filesystem::relative(entry.path(), local_path).string();
-        // string filename = entry.path().filename(); // Outdated, we are now using relative_path
-        // string relative_path = filesystem::relative(entry.path(), local_path).string();
-        cout << "---- RELATIVE PATH 1: "<< relative_path <<" ----" << endl;
+
         FileModel *fileModel = FileModel::populate_local_file_model(commandModel, relative_path);
         cout << relative_path << endl; 
 
@@ -209,93 +205,55 @@ vector<FileModel*> *DataLogic::collect_local_files(CommandModel *commandModel){
     return all_file_models;
 }
 
-// vector<FileModel*> *DataLogic::collect_remote_files(CommandModel *commandModel){
-//     vector<FileModel*> *all_file_models = new vector<FileModel*>();;
-//     cout << "\n\n-=-=-=-=-= DataLogic::get_all_remote_files -=-=-=-=-=" << endl;
-
-//     string remote_path = commandModel->get_remote_dir_path();
-    
-//     sftp_dir dir = sftp_opendir(this->networkLogic->sftpSession->get(), commandModel->get_remote_dir_path().c_str());
-
-//     if (!dir) throw runtime_error("Unable to open remote directory: " + commandModel->get_remote_dir_path());
-
-//     sftp_attributes attrs;
-//     while ((attrs = sftp_readdir(this->networkLogic->sftpSession->get(), dir)) != nullptr) {
-//         if (attrs->type == SSH_FILEXFER_TYPE_REGULAR) {
-//             string relative_path = attrs->name; // This should give us the relative path
-//             cout << "---- RELATIVE PATH 2: "<< relative_path <<" ----" << endl;
-//         // FileModel::populate_remote_file_model(commandModel, attrs->size, attrs->name);
-//             // cout << "File: " << attrs->name << "\n"; // cout << "  Size: " << attrs->size << " bytes\n\n";
-//             cout << "File's relative path: " << relative_path << endl; 
-//             FileModel *fileModel = FileModel::populate_remote_file_model(commandModel, relative_path, attrs->size);
-//             all_file_models->push_back(fileModel);
-//         }
-//         sftp_attributes_free(attrs);
-//     }
-//     sftp_closedir(dir);
-
-//     return all_file_models;
-// }
-
-
-// Helper function for recursive remote file collection.
-void collect_remote_files_recursive(sftp_session sftp,
-    const string &base_path,
-    const string &current_path,
-    CommandModel *commandModel,
-    vector<FileModel*> &files) {
-
-    sftp_dir dir = sftp_opendir(sftp, current_path.c_str());
-    if (!dir) {
-    throw runtime_error("Unable to open remote directory: " + current_path);
-    }
-
-    sftp_attributes attrs;
-    while ((attrs = sftp_readdir(sftp, dir)) != nullptr) {
-    string name = attrs->name;
-    // Skip the current and parent directory entries.
-    if (name == "." || name == "..") {
-    sftp_attributes_free(attrs);
-    continue;
-    }
-
-    // Build the full remote path for the current entry.
-    string full_path = current_path + "/" + name;
-
-    if (attrs->type == SSH_FILEXFER_TYPE_DIRECTORY) {
-    // Recursively traverse the subdirectory.
-    collect_remote_files_recursive(sftp, base_path, full_path, commandModel, files);
-    } else if (attrs->type == SSH_FILEXFER_TYPE_REGULAR) {
-    // Compute the relative path by removing the base path prefix.
-    string relative_path = full_path.substr(base_path.size());
-    if (!relative_path.empty() && relative_path[0] == '/')
-    relative_path = relative_path.substr(1);
-    cout << "---- RELATIVE PATH (remote): " << relative_path << " ----" << endl;
-    FileModel *fileModel = FileModel::populate_remote_file_model(commandModel, relative_path, attrs->size);
-    files.push_back(fileModel);
-    }
-    sftp_attributes_free(attrs);
-    }
-    sftp_closedir(dir);
-}
-
 
 vector<FileModel*> *DataLogic::collect_remote_files(CommandModel *commandModel){
     vector<FileModel*> *all_file_models = new vector<FileModel*>();
-    cout << "\n\n-=-=-=-=-= DataLogic::get_all_remote_files -=-=-=-=-=" << endl;
+    // cout << "\n\n-=-=-=-=-= DataLogic::get_all_remote_files -=-=-=-=-=" << endl;
 
     string remote_base = commandModel->get_remote_dir_path();
     // Start the recursive traversal from the base remote directory.
-    collect_remote_files_recursive(this->networkLogic->sftpSession->get(),
-                                   remote_base,
-                                   remote_base,
-                                   commandModel,
-                                   *all_file_models);
+    collect_remote_files_recursive(this->networkLogic->sftpSession->get(), remote_base, remote_base, commandModel, *all_file_models);
 
     return all_file_models;
 }
 
+// Helper function for recursive remote file collection.
+void DataLogic::collect_remote_files_recursive(sftp_session sftp, const string &base_path, const string &current_path, CommandModel *commandModel, vector<FileModel*> &files) {
 
+    sftp_dir dir = sftp_opendir(sftp, current_path.c_str());
+    if (!dir) {
+        throw runtime_error("!Unable to open remote directory: " + current_path);
+    }
+
+    sftp_attributes attrs;
+    while ((attrs = sftp_readdir(sftp, dir)) != nullptr) {
+        string name = attrs->name;
+        // Skip the current and parent directory entries.
+        if (name == "." || name == "..") {
+            sftp_attributes_free(attrs);
+            continue;
+        }
+
+        // Build the full remote path for the current entry.
+        string full_path = current_path + "/" + name;
+
+        if (attrs->type == SSH_FILEXFER_TYPE_DIRECTORY) {
+            // Recursively traverse the subdirectory.
+            collect_remote_files_recursive(sftp, base_path, full_path, commandModel, files);
+        } else if (attrs->type == SSH_FILEXFER_TYPE_REGULAR) {
+            // Compute the relative path by removing the base path prefix.
+            string relative_path = full_path.substr(base_path.size());
+            if (!relative_path.empty() && relative_path[0] == '/')
+                relative_path = relative_path.substr(1);
+            
+            FileModel *fileModel = FileModel::populate_remote_file_model(commandModel, relative_path, attrs->size);
+            files.push_back(fileModel);
+        }
+
+        sftp_attributes_free(attrs);
+    }
+    sftp_closedir(dir);
+}
 
 
 

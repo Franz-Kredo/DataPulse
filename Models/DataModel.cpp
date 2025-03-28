@@ -13,7 +13,7 @@ void DataModel::add_remote_files(vector<FileModel*> *file_models){
     }
 }
 
-void DataModel::print(std::ostream &os) const {
+void DataModel::print(ostream &os) const {
     os << "\n\n\n";
     os << "===================================================================\n";
     os << "                         DataModel Summary                        \n";
@@ -44,7 +44,7 @@ void DataModel::print(std::ostream &os) const {
     os << "\n\n\n";
 }
 
-std::ostream& operator<<(std::ostream &os, const DataModel &dataModel) {
+ostream& operator<<(ostream &os, const DataModel &dataModel) {
     dataModel.print(os);
     return os;
 }

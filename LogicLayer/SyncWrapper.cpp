@@ -13,17 +13,8 @@ SyncWrapper::SyncWrapper(CommandModel *commandModel){
 }
 
 string SyncWrapper::sync_with_remote(){
-    // try {
-    //     this->networkLogic = new NetworkLogic(commandModel);
-    //     this->networkLogic->list_remote_directory(commandModel);
-    // } catch (const exception &e) {
-    //     cerr << "Exception: " << e.what() << endl;
-    //     return "There was either ssh or sftp error within the constructor of the NetworkLogic.";
-    // }
-
     try {
         // Existing network logic initialization
-        // this->networkLogic = new NetworkLogic(commandModel);
         this->networkLogic->list_remote_directory(this->commandModel);
         
         // Collect data locally and remotely
@@ -31,8 +22,6 @@ string SyncWrapper::sync_with_remote(){
 
         // Write the syncable data to local and remote
         this->dataLogic->write_data(dataModel, commandModel);
-
-        
         
         dataModel = dataModel;
     } 

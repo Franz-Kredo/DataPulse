@@ -94,8 +94,35 @@ private:
     //=============================================================//
     //=================== PRIVATE FILES METHODS ===================//
     //=============================================================//
+
+    /*
+     * @brief Collects local files as a vector of FileModels using the CommandModel
+     * @param commandModel: Instance of CommandModel
+     * @returns vector<FileModel> for local files
+     */
     vector<FileModel*> *collect_local_files(CommandModel *commandModel);
+
+    /*
+     * @brief Collects remote files as a vector of FileModels using the CommandModel
+     * @param commandModel: Instance of CommandModel
+     * @returns vector<FileModel> for remote files
+     */
     vector<FileModel*> *collect_remote_files(CommandModel *commandModel);
+
+    /*
+     * @brief Recursively traverses the remote directory structure to collect regular files.
+     *
+     * @param sftp The active SFTP session used for remote file operations.
+     * @param base_path The base remote directory path used to compute relative paths.
+     * @param current_path The current remote directory path.
+     * @param commandModel Instance of CommandModel.
+     * @param files Reference to a vector<FileModel*>.
+     * 
+     * @returns Nothing. The collected FileModels are appended to the provided vector.
+     */
+    void collect_remote_files_recursive(sftp_session sftp, const string &base_path, const string &current_path, CommandModel *commandModel, vector<FileModel*> &files);
+
+
 
 
 

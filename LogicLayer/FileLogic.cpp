@@ -13,9 +13,9 @@
 // Good chunk size, according to docs 16kb
 
 void FileLogic::read_local_data(FileModel* fileModel, size_t chunk_size){
-    // cout << "=========================================================\nFileLogic::read_local_data() -> Reading the actual data\n=========================================================\n" << endl;
 
     if (fileModel->get_fully_read()) throw runtime_error("!Attempting to read a fully read file: " + fileModel->get_relative_path());
+
     string file_name = fileModel->get_path() + "/" + fileModel->get_relative_path(); 
     //file_name = "FileLogic.h"; // should be repalace
     ifstream file(file_name, ios::binary);
@@ -43,8 +43,8 @@ void FileLogic::read_local_data(FileModel* fileModel, size_t chunk_size){
 }
 
 void FileLogic::write_local_data(FileModel* fileModel){
+    
     string file_name = fileModel->get_path() + "/" + fileModel->get_relative_path(); 
-
 
     // Create directory if it doesn't exist
     filesystem::path filePath(file_name);
@@ -79,6 +79,7 @@ void FileLogic::write_local_data(FileModel* fileModel){
 }
 
 void FileLogic::read_remote_data(FileModel* fileModel, SftpSessionModel *sftpSessionModel, size_t chunk_size){
+    
     if (fileModel->get_fully_read()) 
         throw runtime_error("Attempting to read a fully read file: " + fileModel->get_relative_path());
 
@@ -115,8 +116,8 @@ void FileLogic::read_remote_data(FileModel* fileModel, SftpSessionModel *sftpSes
     this->_update_model_with_data(fileModel, buffer);
 }
 
-
 void FileLogic::write_remote_data(FileModel* fileModel, SftpSessionModel *sftpSessionModel) {
+    
     string full_file_path = fileModel->get_remote_path() + "/" + fileModel->get_relative_path();
     sftp_session sftp = sftpSessionModel->get();
 
@@ -124,7 +125,7 @@ void FileLogic::write_remote_data(FileModel* fileModel, SftpSessionModel *sftpSe
     // Make sure that remote directories exist
     try {
         this->ensure_remote_directories_exist(sftpSessionModel, full_file_path);
-    } catch (const std::exception &e) {
+    } catch (const exception &e) {
         fileModel->set_write_perm(false);
         cerr << "Failed to create remote directories: " << e.what() << endl;
         return;
@@ -180,6 +181,7 @@ void FileLogic::write_remote_data(FileModel* fileModel, SftpSessionModel *sftpSe
 }
 
 size_t FileLogic::_get_remote_size(SftpSessionModel *sftpSessionModel, string full_file_path){
+    
     sftp_attributes attr = sftp_stat(sftpSessionModel->get(), full_file_path.c_str());
     if (!attr) {
         throw runtime_error("Failed to stat remote file: " + full_file_path);
@@ -190,6 +192,7 @@ size_t FileLogic::_get_remote_size(SftpSessionModel *sftpSessionModel, string fu
 }
 
 void FileLogic::_update_model_with_data(FileModel *fileModel, const vector<byte> &buffer){
+    
     if (!fileModel->get_buffer().empty())
         throw runtime_error("Data of file " + fileModel->get_relative_path() + " on the local buffer is being overidden");
     fileModel->populate_buffer(buffer);
@@ -199,9 +202,8 @@ void FileLogic::_update_model_with_data(FileModel *fileModel, const vector<byte>
         fileModel->set_fully_read(true);
 }
 
-
-
 void FileLogic::ensure_remote_directories_exist(SftpSessionModel *sftpSessionModel, const string &full_file_path) {
+    
     sftp_session sftp = sftpSessionModel->get();
     
     // Get the directory portion of the file path.

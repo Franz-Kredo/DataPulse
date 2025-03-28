@@ -7,12 +7,6 @@
 #include <vector>
 
 
-// + local_files: unordered_map<name:string, FileModel*>
-// + remote_files: unordered_map<name:string, FileModel*> 
-
-// + add_local_file(FileModel): void
-// + add_remote_file(FileModel): void
-
 
 class DataModel {
     unordered_map<string, FileModel*> local_files;
@@ -29,10 +23,10 @@ public:
     unordered_map<string, FileModel*> get_remote_files(){return this->remote_files;}
 
 
-    // NICE PRINT METHOD
+
     // Member print method that outputs the contents of the DataModel
-    void print(std::ostream &os) const;
-    friend std::ostream& operator<<(std::ostream &os, const DataModel &dataModel);
+    void print(ostream &os) const;
+    friend ostream& operator<<(ostream &os, const DataModel &dataModel);
 
 private:
 };

@@ -1,18 +1,8 @@
 #include "FileModel.h"
 #include <filesystem>
 
-// #if __has_include(<filesystem>)
-//     #include <filesystem>
-//     namespace fs = std::filesystem;
-// #elif __has_include(<experimental/filesystem>)
-//     #include <experimental/filesystem>
-//     namespace fs = std::experimental::filesystem;
-// #else
-//     #error "Missing the <filesystem> header."
-// #endif
 
-
-FileModel::FileModel(const string& path, const std::string& relative_file_path, std::size_t size)
+FileModel::FileModel(const string& path, const string& relative_file_path, size_t size)
         : path(path), relative_file_path(relative_file_path), size(size)
 	{
 

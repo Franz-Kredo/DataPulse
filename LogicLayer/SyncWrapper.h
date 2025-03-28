@@ -26,6 +26,17 @@ public:
     SyncWrapper(CommandModel *commandModel);
 
     //---- Methods ----//
+
+    /**
+     * @brief Performs file synchronization between local and remote directories.
+     *
+     * This method coordinates the synchronization process by:
+     *  - Listing the remote directory contents,
+     *  - Collecting file data from both local and remote sources,
+     *  - Writing updates to the respective locations as necessary.
+     *
+     * @return A string message indicating the outcome of the synchronization process.
+     */
     string sync_with_remote();
 };
 
