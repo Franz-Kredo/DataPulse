@@ -33,6 +33,7 @@ public:
 private:
     bool _is_conflict(FileModel *local_file, FileModel *remote_file);
     void _overide_file(bool delete_remote, DataModel *dataModel, FileModel *local_file, FileModel *remote_file);
+    void _update_key_in_datmodel(string old_key, string new_key, unordered_map<string, FileModel*>& map);
 };
 
 #endif // CONFLIC_LOGIC_H

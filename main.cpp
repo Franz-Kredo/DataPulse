@@ -36,7 +36,8 @@ void conflict_resolver(SyncWrapper *syncWrapper, DataModel *dataModel){
 
         }
         try{
-            syncWrapper->conflictLogic->conflict_handler(opt, dataModel, local_file, remote_file);
+            string message = syncWrapper->conflictLogic->conflict_handler(opt, dataModel, local_file, remote_file);
+            cout << message << endl;
         } catch(...){
             cout << "We fucked up in syncWrapper->conflictLogic->conflict_handler(opt, dataModel, local_file, remote_file);..." << endl;
         }
@@ -98,6 +99,7 @@ int main(int argc, const char * argv[]) {
         DataModel * dataModel= syncWrapper->initialize_files();
 
         // If the merge flag is on, then we resolve conflicts
+        cout << networkCommandModel->get_merge() << " MERGE stat" << endl;
         if(networkCommandModel->get_merge()) conflict_resolver(syncWrapper,dataModel);
 
         // Do all sync actions
