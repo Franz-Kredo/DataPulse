@@ -5,6 +5,7 @@
 #include "../Models/FileModel.h"
 #include "FileLogic.h"
 #include "NetworkLogic.h"
+#include "DataLogic.h"
 #include <cstddef>
 #include <filesystem>
 #include <fstream>
@@ -15,9 +16,10 @@ using namespace std;
 class ConflictLogic {
     FileLogic *fileLogic;
     NetworkLogic *networkLogic;
+    DataLogic *dataLogic;
 
 public:
-    ConflictLogic(FileLogic *fileLogic, NetworkLogic *networkLogic);
+    ConflictLogic(FileLogic *fileLogic, NetworkLogic *networkLogic, DataLogic *dataLogic);
     string conflict_handler(int option, DataModel *dataModel, FileModel *local_file, FileModel *remote_file); 
     //void mark_conlicting_files(DataModel *dataModel);
     vector<FileModel*> mark_conlicting_files(DataModel *dataModel);

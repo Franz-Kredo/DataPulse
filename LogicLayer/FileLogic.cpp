@@ -61,7 +61,7 @@ void FileLogic::write_local_data(FileModel* fileModel){
     }
 
     if (fileModel->get_buffer().size() == 0){
-        cout << "Skipping write on an empty buffer for:" + fileModel->get_relative_path() << endl;
+        // cout << "Skipping write on an empty buffer for:" + fileModel->get_relative_path() << endl;
         return;
     }
 
@@ -112,7 +112,7 @@ void FileLogic::read_remote_data(FileModel* fileModel, SftpSessionModel *sftpSes
 
     int bytes_read = sftp_read(file, reinterpret_cast<char*>(buffer.data()), chunk_size);
 
-    if(!bytes_read) cout << "Read nothing from remote file: " + file_name  << endl;
+    // if(!bytes_read) cout << "Read nothing from remote file: " + file_name  << endl;
 
     fileModel->increase_bytes_read(bytes_read);
     this->_update_model_with_data(fileModel, buffer);
@@ -123,7 +123,6 @@ void FileLogic::write_remote_data(FileModel* fileModel, SftpSessionModel *sftpSe
     string full_file_path = fileModel->get_remote_path() + "/" + fileModel->get_relative_path();
     sftp_session sftp = sftpSessionModel->get();
 
-    // cout << "|=====| FileLogic::write_remote_data() -> full_file_path: " << full_file_path << endl;
     // Make sure that remote directories exist
     try {
         this->ensure_remote_directories_exist(sftpSessionModel, full_file_path);
@@ -136,11 +135,9 @@ void FileLogic::write_remote_data(FileModel* fileModel, SftpSessionModel *sftpSe
     // Always ensure file exists
     bool file_exists = sftp_stat(sftp, full_file_path.c_str()) != nullptr;
     if (!file_exists){
-        cout << endl << "|----- FileLogic::write_remote_data() -> !file_exits -----|" << endl;
         sftp_file create = sftp_open(sftp, full_file_path.c_str(), O_WRONLY | O_CREAT, S_IRWXU);
         
         if (!create) {
-            cout << "|----- FileLogic::write_remote_data() -> !create -----|" << endl;
             fileModel->set_write_perm(false);
             cerr << "Failed to create remote file " << fileModel->get_relative_path() << endl;
             return;
@@ -150,7 +147,7 @@ void FileLogic::write_remote_data(FileModel* fileModel, SftpSessionModel *sftpSe
     }
     // If there's nothing to write, stop here
     if (fileModel->get_buffer().empty()) {
-        cout << "Skipping remote write on an empty buffer for: " << fileModel->get_relative_path() << endl;
+        // cout << "Skipping remote write on an empty buffer for: " << fileModel->get_relative_path() << endl;
         return;
     }
 

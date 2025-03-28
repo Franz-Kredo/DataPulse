@@ -1,12 +1,5 @@
 #include <iostream>
 
-
-
-// #include <libssh/libssh.h>
-// #include <string>
-// #include <vector>
-// #include "Models/DataModel.h"
-// #include "Models/FileModel.h"
 #include "UILayer/IOHandler.h"
 #include "LogicLayer/SyncWrapper.h"
 #include "Tests/LexiTests/TestHandler.h"
@@ -51,23 +44,13 @@ void conflict_resolver(SyncWrapper *syncWrapper, DataModel *dataModel){
 
 
 int main(int argc, const char * argv[]) {
-    // TestHandler().test_local_file_ops();
-    // return 0;
-    // TestHandler().test_network_connection();
-    // return 0;
     string ret_msg;
     string box_color = "orange";
 
     SyncWrapper *syncWrapper;
 
     CommandModel *networkCommandModel = IOHandler::is_network_command(argc, argv);
-    
-    cout << networkCommandModel->get_merge() << endl;
-    cout << networkCommandModel->get_merge() << endl;
-    cout << networkCommandModel->get_merge() << endl;
-    cout << networkCommandModel->get_merge() << endl;
-    cout << networkCommandModel->get_merge() << endl;
-    cout << networkCommandModel->get_merge() << endl;
+
 
     bool is_help_command = IOHandler::is_help_command(argc, argv);
     
@@ -80,11 +63,8 @@ int main(int argc, const char * argv[]) {
             }
         } 
         catch (const runtime_error &e) {
-            cerr << "!Runtime error occurred: " << e.what() << endl;
-            // cout << "I LOVE BANANANA!" << endl; 
-            IOHandler::output_title("INCORRECTY KEY!!!", "pink"); 
+            cerr << "!Runtime error occurred: " << e.what() << endl; 
             return 0;
-            // return e.what(); // Return or handle the error message as needed
         } 
         catch (const exception &e) {
             cerr << "Exception occurred: " << e.what() << endl;

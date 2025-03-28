@@ -78,7 +78,6 @@ bool IOHandler::validate_unix_filepath(string &filepath){
 }
 
 
-
 CommandModel *IOHandler::is_network_command(int argc, const char * argv[]){
     
     //datap <host> <username> <remote_path> <local_path>
@@ -242,68 +241,6 @@ For further assistance, refer to the project documentation or contact the develo
     std::cout << helpText;
 }
 
-// void IOHandler::display_help_page() {
-
-
-//     cout << "\nDataPulse Help Page\n";
-//     cout << "===================\n\n";
-
-//     cout << "Usage:\n";
-//     cout << "  datapulse [options] <host> <username> <remote_path> <local_path> [priv_key_path]\n\n";
-    
-//     cout << "Options:\n";
-//     cout << "  -h              Display this help message and exit.\n";
-//     cout << "  -m              Enable merge mode (if applicable).\n\n";
-//     cout << "  -t              [pending] Tests the ssh/sftp connection.\n";
-
-
-//     cout << "Usage with options:\n";
-//     cout << "  datapulse -h\n";
-//     cout << "  datapulse -m 192.168.50.42 remote_username /home//someFolder /home/localuser/someOtherFolder /home/localuser/.ssh/priv_key\n\n";
-//     cout << "  datapulse -t 192.168.50.42 remote_username /home//someFolder /home/localuser/someOtherFolder /home/localuser/.ssh/priv_key\n\n";
-
-//     cout << "Arguments:\n";
-//     cout << "  <host>         The remote host address (IP or domain name).\n";
-//     cout << "  <username>     The username for the remote connection.\n";
-//     cout << "  <remote_path>  The absolute path to the remote directory (must be a valid UNIX filepath).\n";
-//     cout << "  <local_path>   The local directory path (must exist on your system).\n";
-//     cout << "  [priv_key_path] (Optional) The file path to your SSH private key for authentication.\n\n";
-
-//     cout << "Description:\n";
-//     cout << "  DataPulse is a command‑line application designed to synchronize files between a\n";
-//     cout << "  local directory and a remote directory over SFTP. It establishes an SSH connection\n";
-//     cout << "  using the provided credentials, reads files from both locations, marks files that\n";
-//     cout << "  are eligible for synchronization, and writes updates back to both locations.\n\n";
-
-//     cout << "Examples:\n";
-//     cout << "  Basic synchronization:\n";
-//     cout << "    datapulse 192.168.1.100 user /remote/directory /local/directory\n\n";
-
-//     cout << "  Using a private key for SSH authentication:\n";
-//     cout << "    datapulse 192.168.1.100 user /remote/directory /local/directory /path/to/private_key\n\n";
-
-//     cout << "  With merge mode enabled:\n";
-//     cout << "    datapulse 192.168.1.100 -m user /remote/directory /local/directory\n\n";
-
-//     cout << "Build Instructions:\n";
-//     cout << "  - Ensure g++ with C++17 support is installed.\n";
-//     cout << "  - Use the provided makefile:\n";
-//     cout << "      make       : Build the executable.\n";
-//     cout << "      make debug : Build the debug version.\n\n";
-
-//     cout << "Troubleshooting:\n";
-//     cout << "  - Verify that the local directory exists.\n";
-//     cout << "  - Ensure the remote path follows UNIX filepath conventions.\n";
-//     cout << "  - Check your SSH credentials and private key file if authentication fails.\n\n";
-
-//     cout << "For further assistance, refer to the project documentation or contact the development team.\n\n";
-// }
-
-//=====================================================//
-
-
-
-
 
 
 // OUTPUT METHODS
@@ -348,19 +285,6 @@ void IOHandler::output_subtitle(const string &subtitle, string color) {
     IOHandler::display_box_layout("", content, color, "white", 50);
 
 }
-// void IOHandler::write_dialoge(string dialog){
-//      for (const char c : dialog) {
-//         cout << c << flush;
-//         this_thread::sleep_for(chrono::milliseconds(10));
-//     }
-// }
-
-// void IOHandler::write_story(string dialog){
-//      for (const char c : dialog) {
-//         cout << c << flush;
-//         this_thread::sleep_for(chrono::milliseconds(5));
-//     }
-// }
 
 void IOHandler::output_msg(const string &msg) {
     string msg_padded = " " + msg + " ";
@@ -513,8 +437,6 @@ bool IOHandler::validate_index_input(int user_input, int size) {
     cout << "Invalid input, enter a number between 1 and " << size << "\n\n";
     return false;
 }
-
-
 
 vector<string> IOHandler::wrap_text(const string &text, size_t max_width) {
     vector<string> lines;

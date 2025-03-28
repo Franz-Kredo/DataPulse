@@ -11,8 +11,8 @@ SyncWrapper::SyncWrapper(CommandModel *commandModel){
     catch (...) { cout << "An error occurred while creating networkLogic." << endl; } 
 
 
-    this->conflictLogic = new ConflictLogic(this->fileLogic, this->networkLogic);
-    this->dataLogic = new DataLogic(this->fileLogic, this->networkLogic, this->conflictLogic);
+    this->dataLogic = new DataLogic(this->fileLogic, this->networkLogic);
+    this->conflictLogic = new ConflictLogic(this->fileLogic, this->networkLogic, this->dataLogic);
 }
 DataModel *SyncWrapper::initialize_files(){
         // Collect data locally and remotely

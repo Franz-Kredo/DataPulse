@@ -2,7 +2,6 @@
 #ifndef DATALOGIC_H
 #define DATALOGIC_H
 
-#include "ConflictLogic.h"
 #include "FileLogic.h"
 #include "NetworkLogic.h"
 
@@ -12,15 +11,22 @@
 #include "../Models/PlaceholderModel.h"
 
 
+#include "../UILayer/IOHandler.h"
+
+
+#include <openssl/md5.h>
+#include <fcntl.h>
+#include <openssl/evp.h>
+
+
 #include <unordered_map>
 
 class DataLogic{
 public:
     FileLogic *fileLogic;
     NetworkLogic *networkLogic;
-    ConflictLogic *conflictLogic;
 
-    DataLogic(FileLogic *fileLogic, NetworkLogic *networkLogic, ConflictLogic *conflictLogic);
+    DataLogic(FileLogic *fileLogic, NetworkLogic *networkLogic);
     
     // DataLogic(FileLogic *fileLogic);
 

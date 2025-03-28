@@ -1,24 +1,9 @@
 #include "DataLogic.h"
-#include "ConflictLogic.h"
-
-#include "../UILayer/IOHandler.h"
 
 
-#include <openssl/md5.h>
-#include <fcntl.h>
-#include <openssl/evp.h>
-
-// #include <fstream>
-// #include <sstream>
-// #include <iomanip>
-// #include <vector>
-// #include <stdexcept>
-
-
-DataLogic::DataLogic(FileLogic *fileLogic, NetworkLogic *networkLogic, ConflictLogic *conflictLogic){
+DataLogic::DataLogic(FileLogic *fileLogic, NetworkLogic *networkLogic){
     this->fileLogic = fileLogic;
     this->networkLogic = networkLogic;
-    this->conflictLogic = conflictLogic;
 }
 
 //==================================================================//
@@ -39,23 +24,20 @@ bool DataLogic::compare_synced_data(DataModel *dataModel, CommandModel *commandM
         const string &relative_path = pair.first;
         FileModel* local_file = pair.second;
         auto remote_file_model = remote_files.find(relative_path);
-        if(remote_file_model == remote_files.end()) {
-            cout << "Some sync issue with: " << relative_path << endl;
-            all_good = false;
-            // local_file->set_can_sync(true);
-        }
-
         if(is_merge){ // should be if(is_merge), I'm doing if(!is_merge) for testing
             string local_md5 = compute_md5_local(local_file->get_local_file_path());
             string remote_md5 = compute_md5_remote(this->networkLogic->sftpSession, remote_files[relative_path]->get_remote_file_path());
 
             if (local_md5 == remote_md5) {
-                cout << "Files are identical based on MD5 checksum." << endl;
-            } else {
-                cout << "Files differ at " << relative_path << endl;
-                all_good = false;
-            }
+                cout << "Files at " << relative_path << " are identical based on MD5 checksum." << endl;
+            } 
         }
+        else if(remote_file_model == remote_files.end()) {
+            cout << "Some sync issue with: " << relative_path << endl;
+            all_good = false;
+            // local_file->set_can_sync(true);
+        }
+
 
     }
     //--- Going through all remote files to mark files that don't exist locally ---//
@@ -63,20 +45,17 @@ bool DataLogic::compare_synced_data(DataModel *dataModel, CommandModel *commandM
         const string &relative_path = pair.first;
         FileModel* remote_file = pair.second;
         auto local_file_model = local_files.find(relative_path);
-        if(local_file_model == local_files.end()) {
-            cout << "Some sync issue with: " << relative_path << endl;
-            all_good = false;
-        }
         if(is_merge){ // should be if(is_merge), I'm doing if(!is_merge) for testing
             string remote_md5 = compute_md5_remote(this->networkLogic->sftpSession, remote_file->get_remote_file_path());
             string local_md5 = compute_md5_local(remote_files[relative_path]->get_local_file_path());
 
             if (local_md5 == remote_md5) {
-                cout << "Files are identical based on MD5 checksum." << endl;
-            } else {
-                cout << "Files differ at " << relative_path << endl;
-                all_good = false;
-            }
+                cout << "Files at " << relative_path << " are identical based on MD5 checksum." << endl;
+            } 
+        }
+        else if(local_file_model == local_files.end()) {
+            cout << "Some sync issue with: " << relative_path << endl;
+            all_good = false;
         }
     }
 
@@ -186,19 +165,14 @@ string DataLogic::compute_md5_remote(SftpSessionModel *sftpSessionModel, const s
 //================================================================//
 
 DataModel *DataLogic::collect_files(CommandModel *commandModel){ 
-    // cout << "Collecting all local files as vector of FileModels" << endl;
     vector<FileModel*> *local_files = this->collect_local_files(commandModel);
-    // cout << "Collecting all remote files as vector of FileModels" << endl;
     vector<FileModel*> *remote_files = this->collect_remote_files(commandModel);
-    // cout << "\n\n\n\n\n\n";
 
-    cout << "After collecting FileModel for each file both local and remote" << endl;
     // Throw messages to main to print more info for user
     if (local_files == nullptr && remote_files == nullptr) throw runtime_error("!Error: Failed reading both local and remote files.");
     if (local_files == nullptr) throw runtime_error("!Error: Failed reading local files.");
     if (remote_files == nullptr) throw runtime_error("!Error: Failed reading remote files.");
 
-    cout << "Creating DataModel" << endl;
     DataModel *dataModel = new DataModel();
     
     // cout << "Populating local files to DataModel" << endl;
@@ -215,6 +189,7 @@ DataModel *DataLogic::collect_files(CommandModel *commandModel){
     // cout << "Return DataModel" << endl;
     return dataModel;
 }
+
 
 DataModel *DataLogic::write_data(DataModel *dataModel, CommandModel *commandModel){
     if (dataModel == nullptr) throw runtime_error("!Error: dataModel is empty in DataLogic::write_data().");
@@ -267,8 +242,6 @@ DataModel *DataLogic::mark_syncable_files(DataModel *dataModel, CommandModel *co
     } 
     
     
-    //=== For a merge sync ===//
-    cout << "DataLogic::mark_syncable_files() -> You just tried to mark syncable files with merge, this might not be implemented yet..." << endl;
     return dataModel;
 }
 
