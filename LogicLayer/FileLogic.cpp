@@ -203,20 +203,25 @@ void FileLogic::_update_model_with_data(FileModel *fileModel, const vector<byte>
 
 void FileLogic::ensure_remote_directories_exist(SftpSessionModel *sftpSessionModel, const string &full_file_path) {
     sftp_session sftp = sftpSessionModel->get();
+    
     // Get the directory portion of the file path.
     size_t pos = full_file_path.find_last_of("/");
-    if (pos == string::npos) return; // No directory part
+    
+    // If no directory path is found, then we exit.
+    if (pos == string::npos) return; 
+    
     string remote_dir = full_file_path.substr(0, pos);
 
-    // Split the directory path into its components.
+    // Split the directory path into its components to make it more digestible if u know wat i mean ;)
     vector<string> components;
     size_t start = 0;
     if (!remote_dir.empty() && remote_dir[0] == '/') {
-        start = 1; // skip leading '/'
+        start = 1; // skip leading '/' since we hate that guy
     }
+    // Loop through each block in the path
     while (start < remote_dir.size()) {
         size_t end = remote_dir.find('/', start);
-        if (end == string::npos) {
+        if (end == string::npos) { // Simply just checking if there was no '/' found
             components.push_back(remote_dir.substr(start));
             break;
         } else {
@@ -230,11 +235,13 @@ void FileLogic::ensure_remote_directories_exist(SftpSessionModel *sftpSessionMod
     if (!remote_dir.empty() && remote_dir[0] == '/') {
         currentPath = "/";
     }
+    // cout << "BUILDING PATH ;) : " << endl;
     for (const auto &comp : components) {
         if (currentPath != "/" && !currentPath.empty()) {
             currentPath += "/";
         }
         currentPath += comp;
+
         // Check if the directory exists.
         if (sftp_stat(sftp, currentPath.c_str()) == nullptr) {
             // Create the directory
@@ -244,3 +251,4 @@ void FileLogic::ensure_remote_directories_exist(SftpSessionModel *sftpSessionMod
         }
     }
 }
+
