@@ -3,7 +3,7 @@ CXX = g++
 CXXFLAGS = -Wall -std=c++17
 CXXDEBUGFLAGS = -ggdb -fsanitize=address -fsanitize=undefined
 INCLUDES = -Iinclude
-LIBS = -lssh
+LIBS = -lssh -lcrypto
 
 # Production source files (all .cpp files in src/ and its subdirectories)
 PROD_SRC = $(wildcard src/*.cpp) $(wildcard src/*/*.cpp) $(wildcard UILayer/*.cpp) $(wildcard Models/*.cpp) $(wildcard LogicLayer/*.cpp) $(wildcard Tests/LexiTests/*.cpp)
@@ -35,6 +35,10 @@ debug: clean
 # Run the executable
 run: $(TARGET)
 	./$(TARGET) 192.168.42.125 franz /home/franz/pa5 /home/franz/github_repos/DataPulse/SyncTester /home/franz/.ssh/pa5 
+
+# Run the executable
+run2: $(TARGET)
+	./$(TARGET) -m 192.168.42.125 franz /home/franz/pa5 /home/franz/github_repos/DataPulse/SyncTester /home/franz/.ssh/pa5 
 
 # Run tests for the is_help_command method
 help:clean $(TARGET)
