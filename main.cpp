@@ -70,6 +70,7 @@ int main(int argc, const char * argv[]) {
         DataModel * dataModel= syncWrapper->initialize_files();
 
         // If the merge flag is on, then we resolve conflicts
+        cout << networkCommandModel->get_merge() << " MERGE stat" << endl;
         if(networkCommandModel->get_merge()) conflict_resolver(syncWrapper,dataModel);
 
         // Do all sync actions
