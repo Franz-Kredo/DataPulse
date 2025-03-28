@@ -10,10 +10,17 @@ FileModel::FileModel(const string& path, const string& relative_file_path, size_
 }
 
 string FileModel::get_remote_file_path(){
-    return this->get_remote_path() + "/" + this->get_name();
+    // return this->get_remote_path() + "/" + this->get_name();
+    cout << "GETTING FULL REMOTE FILE PATH" << endl;
+    cout << this->get_remote_path() << "/" << this->get_relative_path() << endl;
+    return this->get_remote_path() + "/" + this->get_relative_path();
 }
 string FileModel::get_local_file_path(){
-    return this->get_path() + "/" + this->get_name();
+    // return this->get_path() + "/" + this->get_name();
+    // cout << "GETTING FULL LOCAL FILE PATH" << endl;
+    cout << this->get_path() << "/" << this->get_relative_path() << endl;
+
+    return this->get_path() + "/" + this->get_relative_path();
 }
 
 void FileModel::populate_buffer(const vector<byte>& data){ 

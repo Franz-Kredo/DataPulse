@@ -79,7 +79,7 @@ DataModel *DataLogic::collect_files(CommandModel *commandModel){
     dataModel = this->mark_syncable_files(dataModel, commandModel);
 
     // Let's grab some conflicts and resolve em
-    this->conflictLogic->mark_conlicting_files(dataModel);
+    // this->conflictLogic->mark_conlicting_files(dataModel);
     
     //--- Printing Data Model Pretty! ---//
     cout << *dataModel << endl;

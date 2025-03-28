@@ -14,7 +14,7 @@ ConflictLogic::ConflictLogic(FileLogic* fileLogic, NetworkLogic *networkLogic){
     
 
 string ConflictLogic::conflict_handler(int option, DataModel *dataModel, FileModel *local_file, FileModel *remote_file){
-    SftpSessionModel *sftpSessionModel = this->networkLogic->sftpSession;
+    // SftpSessionModel *sftpSessionModel = this->networkLogic->sftpSession;
 
     if (option == 1){
         this->overide_with_newer_file(dataModel, local_file, remote_file);
@@ -89,17 +89,25 @@ void ConflictLogic::keep_both_files_auto_rename(DataModel *dataModel, FileModel 
     unordered_map<string, FileModel*>  local_files = dataModel->get_local_files();
     unordered_map<string, FileModel*>  remote_files = dataModel->get_remote_files();
 
-    string remote_file_path = remote_file->get_remote_path() + "/" + remote_file->get_name();
+    // string remote_file_path = remote_file->get_remote_path() + "/" + remote_file->get_name();
+    string remote_file_path = remote_file->get_remote_file_path();
     string new_remote_name = remote_file->get_name() + "_r";
     while (local_files.count(new_remote_name) != 0 && remote_files.count(new_remote_name) != 0)
         new_remote_name +="_r";
-    string new_remote_file_path = remote_file->get_remote_path() + "/" + new_remote_name;
+        
+    remote_file->set_name(new_remote_name);
+    // string new_remote_file_path = remote_file->get_remote_path() + "/" + new_remote_name;
+    string new_remote_file_path = remote_file->get_remote_file_path();
 
-    string local_file_path = local_file->get_path() + "/" + local_file->get_name();
+    // string local_file_path = local_file->get_path() + "/" + local_file->get_name();
+    string local_file_path = local_file->get_local_file_path();
     string new_local_name = local_file->get_name() + "_l";
     while (local_files.count(new_local_name) != 0 && remote_files.count(new_local_name) != 0)
         new_local_name +="_l";
-    string new_local_file_path = local_file->get_path() + "/" + new_local_name;
+
+    local_file->set_name(new_local_name);
+    // string new_local_file_path = local_file->get_path() + "/" + new_local_name;
+    string new_local_file_path = local_file->get_path() + "/" + local_file->get_local_file_path();
 
     int rc = sftp_rename(sftpSessionModel->get(), remote_file_path.c_str(), new_remote_file_path.c_str());
     if (rc < 0) 
@@ -145,7 +153,8 @@ void ConflictLogic::_overide_file(bool delete_remote, DataModel *dataModel, File
             cout << "Failed to overide: " << remote_file->get_remote_file_path() << endl;
             return this->omit_from_sync(local_file, remote_file);
         }
-        auto it = remote_files.find(remote_file->get_name());
+        // auto it = remote_files.find(remote_file->get_name());
+        auto it = remote_files.find(remote_file->get_relative_path());
         if (it != remote_files.end()) {
             delete it->second;
             remote_files.erase(it);
@@ -160,7 +169,8 @@ void ConflictLogic::_overide_file(bool delete_remote, DataModel *dataModel, File
             cout << "Failed to overide: " << local_file->get_local_file_path() << endl;
             return this->omit_from_sync(local_file, remote_file);
         }
-        auto it = local_files.find(local_file->get_name());
+        // auto it = local_files.find(local_file->get_name());
+        auto it = local_files.find(local_file->get_relative_path());
         if (it != local_files.end()) {
             delete it->second;
             local_files.erase(it);

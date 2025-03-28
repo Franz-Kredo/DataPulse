@@ -22,7 +22,7 @@ void conflict_resolver(SyncWrapper *syncWrapper, DataModel *dataModel){
     unordered_map<string, FileModel*>&  remote_files = dataModel->get_remote_files();
     vector<FileModel*> local_conflicts = syncWrapper->conflictLogic->mark_conlicting_files(dataModel);
     for (FileModel* local_file : local_conflicts){
-        FileModel *remote_file = remote_files[local_file->get_name()];
+        FileModel *remote_file = remote_files[local_file->get_relative_path()];
         if(!apply_to_all){
             cout << local_file->get_name() +" Conflicting" << endl;
             cout << "\n\nChoose_how_to_resolve" << endl;
@@ -35,7 +35,11 @@ void conflict_resolver(SyncWrapper *syncWrapper, DataModel *dataModel){
         }else{
 
         }
+        try{
             syncWrapper->conflictLogic->conflict_handler(opt, dataModel, local_file, remote_file);
+        } catch(...){
+            cout << "We fucked up in syncWrapper->conflictLogic->conflict_handler(opt, dataModel, local_file, remote_file);..." << endl;
+        }
         
 
         
@@ -61,10 +65,11 @@ int main(int argc, const char * argv[]) {
     if(networkCommandModel) {
         // This might break since the NetworkLogic may or may not be initiated
         syncWrapper = new SyncWrapper(networkCommandModel);
+        
+        
         DataModel * dataModel= syncWrapper->sync_and_resolve_conflict();
 
         conflict_resolver(syncWrapper,dataModel);
-        
         ret_msg = syncWrapper->sync_with_remote(dataModel);
         
         // syncWrapper->networkLogic->list_remote_directory(networkCommandModel);

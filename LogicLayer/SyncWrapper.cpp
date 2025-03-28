@@ -31,11 +31,23 @@ string SyncWrapper::sync_with_remote(DataModel *dataModel){
     // }
 
     try {
+        // // Existing network logic initialization
+        // this->networkLogic->list_remote_directory(this->commandModel);
+        
+        // // Collect data locally and remotely
+        // DataModel *dataModel = this->dataLogic->collect_files(this->commandModel);
+
+        // // Write the syncable data to local and remote
+        // this->dataLogic->write_data(dataModel, commandModel);
+        
+        // dataModel = dataModel;
+
         // Existing network logic initialization
         // this->networkLogic = new NetworkLogic(commandModel);
         //this->networkLogic->list_remote_directory(this->commandModel);
         // Collect data locally and remotely
-        //DataModel *dataModel = this->dataLogic->collect_files(this->commandModel);
+        // DataModel *dataModel = this->dataLogic->collect_files(this->commandModel);
+        // DataModel *newDataModel = this->dataLogic->collect_files(this->commandModel);
 
 
         // Write the syncable data to local and remote
