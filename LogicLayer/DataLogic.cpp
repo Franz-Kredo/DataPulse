@@ -17,19 +17,26 @@ bool DataLogic::compare_synced_data(DataModel *dataModel, CommandModel *commandM
     
     bool all_good = true;
     bool is_merge = commandModel->get_merge();
+    if(is_merge){
+        cout << "Files:" << endl;
+    }
 
+    // unordered_map<string, string>
 
     for (const auto &pair : local_files) {
         const string &relative_path = pair.first;
         FileModel* local_file = pair.second;
         auto remote_file_model = remote_files.find(relative_path);
-        if(is_merge){ // should be if(is_merge), I'm doing if(!is_merge) for testing
+        if(is_merge){
             string local_md5 = compute_md5_local(local_file->get_local_file_path());
             string remote_md5 = compute_md5_remote(this->networkLogic->sftpSession, remote_files[relative_path]->get_remote_file_path());
 
             if (local_md5 == remote_md5) {
                 cout << "Files at " << relative_path << " are identical based on MD5 checksum." << endl;
-            } 
+                cout << relative_path << "\t-\tSame" << endl;
+            } else {
+                cout << relative_path << "\t-\tDifferent" << endl;
+            }
         }
         else if(remote_file_model == remote_files.end()) {
             cout << "Some sync issue with: " << relative_path << endl;
