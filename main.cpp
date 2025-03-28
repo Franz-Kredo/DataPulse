@@ -66,13 +66,13 @@ int main(int argc, const char * argv[]) {
         // This might break since the NetworkLogic may or may not be initiated
         syncWrapper = new SyncWrapper(networkCommandModel);
         
-        
-        DataModel * dataModel= syncWrapper->sync_and_resolve_conflict();
+        DataModel * dataModel= syncWrapper->initialize_files();
 
-        conflict_resolver(syncWrapper,dataModel);
+        // If the merge flag is on, then we resolve conflicts
+        if(networkCommandModel->get_merge()) conflict_resolver(syncWrapper,dataModel);
+
+        // Do all sync actions
         ret_msg = syncWrapper->sync_with_remote(dataModel);
-        
-        // syncWrapper->networkLogic->list_remote_directory(networkCommandModel);
 
         // Change color of the text box if there is ! at the start of the string
         if (!ret_msg.empty() && ret_msg[0] == '!') {
