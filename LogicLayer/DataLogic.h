@@ -42,7 +42,7 @@ public:
      * @param commandModel: Takes in the an instance of CommandModel
      * @returns DataModel: 
      */
-    DataModel *collect_files(CommandModel *commandModel);
+    DataModel *collect_files(CommandModel *commandModel, bool print_model=true);
 
     /*
      * @brief Uses the DataModel to write at local and remote directories using internal methods

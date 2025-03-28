@@ -127,7 +127,7 @@ CommandModel *IOHandler::is_network_command(int argc, const char * argv[]){
         priv_key_path = argv[5+offset];
     }
 
-    cout << endl << "------------- Let's see what args we have -------------" << endl << endl;
+    cout << endl << "\n\n------------- Let's see what args we have -------------" << endl << endl;
 
     cout << "\t==> Total args (argx): " << argc << endl;
     cout << "\thost: " << host << endl;

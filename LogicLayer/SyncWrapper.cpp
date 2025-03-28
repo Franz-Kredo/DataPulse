@@ -30,7 +30,7 @@ string SyncWrapper::sync_with_remote(DataModel *dataModel){
         // IOHandler::wait(3);
         bool sync_completed = this->verify_sync(dataModel);
         if(sync_completed) 
-            return "Sync was successful!";
+            return "Sync concluded!";
         else
             return "Sync verification was unsuccessful, something went wrong in syncing or verification...";
 
@@ -54,7 +54,7 @@ string SyncWrapper::sync_with_remote(DataModel *dataModel){
 
 bool SyncWrapper::verify_sync(DataModel *oldDataModel){
     // Collect data locally and remotely
-    DataModel *dataModel = this->dataLogic->collect_files(this->commandModel);
+    DataModel *dataModel = this->dataLogic->collect_files(this->commandModel, false);
     
     bool is_synced = this->dataLogic->compare_synced_data(dataModel, this->commandModel);
 

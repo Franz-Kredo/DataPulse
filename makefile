@@ -14,7 +14,7 @@ SRC_FILES = main.cpp $(PROD_SRC)
 OBJFILES = $(SRC_FILES:.cpp=.o)
 
 # Name of the final executable
-TARGET = datapulse.out
+TARGET = datap
 
 .PHONY: all debug run short fast deb clean fresh help
 

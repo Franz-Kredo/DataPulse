@@ -11,7 +11,6 @@ DataLogic::DataLogic(FileLogic *fileLogic, NetworkLogic *networkLogic){
 //==================================================================//
 
 bool DataLogic::compare_synced_data(DataModel *dataModel, CommandModel *commandModel){
-    IOHandler::output_subtitle("Comparing synced data...", "blue");
 
     unordered_map<string, FileModel*> local_files = dataModel->get_local_files();
     unordered_map<string, FileModel*> remote_files = dataModel->get_remote_files();
@@ -164,7 +163,7 @@ string DataLogic::compute_md5_remote(SftpSessionModel *sftpSessionModel, const s
 //=============== PUBLIC READING & WRITING METHODS ===============//
 //================================================================//
 
-DataModel *DataLogic::collect_files(CommandModel *commandModel){ 
+DataModel *DataLogic::collect_files(CommandModel *commandModel, bool print_model){ 
     vector<FileModel*> *local_files = this->collect_local_files(commandModel);
     vector<FileModel*> *remote_files = this->collect_remote_files(commandModel);
 
@@ -183,8 +182,10 @@ DataModel *DataLogic::collect_files(CommandModel *commandModel){
     // cout << "Mark syncable files to DataModel" << endl;
     dataModel = this->mark_syncable_files(dataModel, commandModel);
     
-    //--- Printing Data Model Pretty! ---//
-    cout << *dataModel << endl;
+    if(print_model){
+        //--- Printing Data Model Pretty! ---//
+        cout << *dataModel << endl;
+    }
     
     // cout << "Return DataModel" << endl;
     return dataModel;
@@ -252,8 +253,6 @@ DataModel *DataLogic::mark_syncable_files(DataModel *dataModel, CommandModel *co
 //===============================================================//
 
 DataModel *DataLogic::write_local(DataModel *dataModel, CommandModel *commandModel){
-    cout << "DataLogic::write_local() was called" << endl;
-    
     size_t chunk_size = 16384;
     
     unordered_map<string, FileModel *> local_files = dataModel->get_local_files();
