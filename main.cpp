@@ -60,11 +60,40 @@ int main(int argc, const char * argv[]) {
     SyncWrapper *syncWrapper;
 
     CommandModel *networkCommandModel = IOHandler::is_network_command(argc, argv);
+    
+    cout << networkCommandModel->get_merge() << endl;
+    cout << networkCommandModel->get_merge() << endl;
+    cout << networkCommandModel->get_merge() << endl;
+    cout << networkCommandModel->get_merge() << endl;
+    cout << networkCommandModel->get_merge() << endl;
+    cout << networkCommandModel->get_merge() << endl;
+
     bool is_help_command = IOHandler::is_help_command(argc, argv);
     
     if(networkCommandModel) {
         // This might break since the NetworkLogic may or may not be initiated
-        syncWrapper = new SyncWrapper(networkCommandModel);
+        try{
+            syncWrapper = new SyncWrapper(networkCommandModel);
+            if(syncWrapper->networkLogic->sftpSession == nullptr){
+                return 0;
+            }
+        } 
+        catch (const runtime_error &e) {
+            cerr << "!Runtime error occurred: " << e.what() << endl;
+            // cout << "I LOVE BANANANA!" << endl; 
+            IOHandler::output_title("INCORRECTY KEY!!!", "pink"); 
+            return 0;
+            // return e.what(); // Return or handle the error message as needed
+        } 
+        catch (const exception &e) {
+            cerr << "Exception occurred: " << e.what() << endl;
+            return 0;
+        } 
+        catch (...) {
+            cerr << "Unknown error occurred." << endl;
+            return 0;
+        }
+    
         
         DataModel * dataModel= syncWrapper->initialize_files();
 

@@ -46,6 +46,12 @@ public:
      */
     DataModel *write_data(DataModel *dataModel, CommandModel *commandModel);
 
+
+
+    string compute_md5_local(const std::string& file_path);
+    string compute_md5_remote(SftpSessionModel *sftpSessionModel, const std::string& remote_path);
+        
+
 private:
     //=====================================================//
     //=================== READING FIlES ===================//

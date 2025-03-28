@@ -93,9 +93,11 @@ CommandModel *IOHandler::is_network_command(int argc, const char * argv[]){
     //datap <host> <username> <remote_path> <local_path> <priv_key_path>
     //datap <host> <-flag> <username> <remote_path> <local_path>
     //datap <host> <-flag> <username> <remote_path> <local_path> <priv_key_path>
+
+
     
     int min_args = 5;
-    int max_args = 7; // With -m flag (merge) + priv_key_path
+    int max_args = 8; // With -m flag (merge) + priv_key_path
     int offset = 0;
     
     string host = "";
@@ -112,37 +114,38 @@ CommandModel *IOHandler::is_network_command(int argc, const char * argv[]){
     if (argc < min_args || max_args < argc) return nullptr;
     
     // If there is more than minimum, then check if the 
-    if (string(argv[2]) == "-m"){
-        flag = argv[2];
+    if (string(argv[1]) == "-m"){
+        flag = argv[1];
         offset = 1;
     } 
     // I know, it's a little reduntant
     // I'm simply checking if there are too many argument, if there is no flag, then there should be max_args-1 amount or less
-    else if(argc >= max_args && string(argv[2]) != "-m"){
+    else if(argc >= max_args && string(argv[1]) != "-m"){
         return nullptr;
     }
         
-    host = argv[1]; // No offset since it's the first element
+    host = argv[1+offset]; // No offset since it's the first element
     username = argv[2+offset];
     remote_path = argv[3+offset];
     if (4+offset < argc)
         local_path = argv[4+offset];
     
 
-    if(argc == max_args || (offset == 0 && 5 < argc) ){
+    if(argc == max_args || (5 < argc) ){
+    // if(argc == max_args || (offset == 0 && 6 < argc) ){
         priv_key_path = argv[5+offset];
     }
 
-    // cout << endl << "------------- Let's see what args we have -------------" << endl << endl;
+    cout << endl << "------------- Let's see what args we have -------------" << endl << endl;
 
-    // cout << "\t==> Total args (argx): " << argc << endl;
-    // cout << "\thost: " << host << endl;
-    // cout << "\tflag: " << flag << endl;
-    // cout << "\tusername: " << username << endl;
-    // cout << "\tremote_path: " << remote_path << endl;
-    // cout << "\tlocal_path: " << local_path << endl;
-    // cout << "\tpriv_key_path: " << priv_key_path << endl;
-    // cout << endl << "-------------------------------------------------------" << endl;
+    cout << "\t==> Total args (argx): " << argc << endl;
+    cout << "\thost: " << host << endl;
+    cout << "\tflag: " << flag << endl;
+    cout << "\tusername: " << username << endl;
+    cout << "\tremote_path: " << remote_path << endl;
+    cout << "\tlocal_path: " << local_path << endl;
+    cout << "\tpriv_key_path: " << priv_key_path << endl;
+    cout << endl << "-------------------------------------------------------" << endl;
 
 
     // // Validate that the file exists
@@ -165,6 +168,10 @@ CommandModel *IOHandler::is_network_command(int argc, const char * argv[]){
     retCommandModel->set_remote_path(remote_path);
     retCommandModel->set_local_path(local_path);
     retCommandModel->set_priv_key_path(priv_key_path);
+    
+    if(flag != "")
+        retCommandModel->set_merge(true);
+
 
 
     return retCommandModel;
