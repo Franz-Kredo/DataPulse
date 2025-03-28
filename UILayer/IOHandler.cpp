@@ -136,7 +136,7 @@ CommandModel *IOHandler::is_network_command(int argc, const char * argv[]){
     cout << "\tremote_path: " << remote_path << endl;
     cout << "\tlocal_path: " << local_path << endl;
     cout << "\tpriv_key_path: " << priv_key_path << endl;
-    cout << endl << "-------------------------------------------------------" << endl;
+    cout << endl << "-------------------------------------------------------\n\n" << endl;
 
 
     // // Validate that the file exists

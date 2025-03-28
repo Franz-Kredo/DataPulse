@@ -327,7 +327,7 @@ vector<FileModel*> *DataLogic::collect_local_files(CommandModel *commandModel){
         string relative_path = filesystem::relative(entry.path(), local_path).string();
 
         FileModel *fileModel = FileModel::populate_local_file_model(commandModel, relative_path);
-        cout << relative_path << endl; 
+        // cout << relative_path << endl; 
 
         all_file_models->push_back(fileModel);
     }

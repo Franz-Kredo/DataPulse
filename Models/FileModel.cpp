@@ -5,8 +5,6 @@
 FileModel::FileModel(const string& path, const string& relative_file_path, size_t size)
         : path(path), relative_file_path(relative_file_path), size(size)
 	{
-
-
 }
 
 string FileModel::get_remote_file_path(){
@@ -35,8 +33,6 @@ FileModel *FileModel::populate_local_file_model(CommandModel *commandModel, stri
     FileModel *fileModel = new FileModel(local_dir_path, relative_file_path, file_size);
     fileModel->set_remote_dir_path(remote_dir_path);
 
-    // cout << "I------I  file_size is " << file_size <<"  I------I" << endl;
-
 
     return fileModel;
 }
@@ -47,8 +43,6 @@ FileModel *FileModel::populate_remote_file_model(CommandModel *commandModel, str
 
     FileModel *fileModel = new FileModel(local_dir_path, relative_file_path, file_size);
     fileModel->set_remote_dir_path(remote_dir_path);
-
-    // cout << "I------I  file_size is " << file_size <<"  I------I" << endl;
 
 
     return fileModel;

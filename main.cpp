@@ -97,8 +97,8 @@ int main(int argc, const char * argv[]) {
         return 0;
     } 
     else {
-        ret_msg = "Hmm, this is neither help or network command, maybe try the help pages?";
-        box_color = "purple";
+        ret_msg = "Invalid Command";
+        box_color = "pink";
     }
     
     IOHandler::output_title(ret_msg, box_color);
