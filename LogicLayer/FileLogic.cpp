@@ -1,5 +1,4 @@
 #include "FileLogic.h"
-#include <charconv>
 #include <cstddef>
 #include <filesystem>
 #include <ios>
@@ -9,6 +8,9 @@
 #include <libssh/sftp.h>
 #include <fcntl.h>
 #include <vector>
+#include <ctime>
+#include <stdexcept>
+#include <sys/stat.h>
 
 // Good chunk size, according to docs 16kb
 
@@ -253,4 +255,24 @@ void FileLogic::ensure_remote_directories_exist(SftpSessionModel *sftpSessionMod
         }
     }
 }
+
+// Yeah I know c code, but this is absurd to do in cpp
+time_t FileLogic::get_local_last_modified(FileModel *fileModel) {
+    struct stat attr;
+    if (stat(fileModel->get_local_file_path().c_str(), &attr) == 0) {
+        return attr.st_mtime;
+    }
+    throw runtime_error("Failed to stat local file: " + fileModel->get_local_file_path());
+    return -1;
+}
+
+time_t FileLogic::get_remote_last_modified(FileModel *fileModel, SftpSessionModel *sftpSessionModel){
+    sftp_attributes attr = sftp_stat(sftpSessionModel->get(), fileModel->get_remote_file_path().c_str());
+    if (!attr) throw std::runtime_error("Failed to stat remote file: " + fileModel->get_remote_file_path());
+    time_t modified_time = attr->mtime;
+    sftp_attributes_free(attr);
+    return modified_time;
+
+}
+
 

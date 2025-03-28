@@ -5,6 +5,7 @@
 
 #include "../Models/CommandModel.h"
 
+#include "ConflictLogic.h"
 #include "DataLogic.h"
 #include "NetworkLogic.h"
 #include "FileLogic.h"
@@ -22,6 +23,7 @@ public:
     DataLogic *dataLogic;
     NetworkLogic *networkLogic;
     FileLogic *fileLogic;
+    ConflictLogic *conflictLogic;
     
     SyncWrapper(CommandModel *commandModel);
 
@@ -37,7 +39,7 @@ public:
      *
      * @return A string message indicating the outcome of the synchronization process.
      */
-    string sync_with_remote();
+    string sync_with_remote(DataModel *dataModel);
 
 
     /**
@@ -47,6 +49,9 @@ public:
      * @return A boolean wether the sync was successful or not
      */
     bool verify_sync(DataModel *oldDataModel);
+    
+    DataModel *sync_and_resolve_conflict();
+    // string sync_with_remote(DataModel *dataModel);
 };
 
 #endif // SYNCWRAPPER_H

@@ -30,8 +30,9 @@ class FileModel {
 	bool write_perm;
 	bool can_sync = false;
 	vector<byte> buffer;
-	size_t bytes_read = 0; // in phase 2 if file is huge we might want to read and write in turns so the ram does not get nuked
+	size_t bytes_read = 0;
 	bool fully_read = false;
+	bool has_conflict = false;
 
 public:
 	//FileModel() = default;
@@ -52,6 +53,10 @@ public:
 	vector<byte> get_buffer() const {return this->buffer;}	
 	bool get_fully_read() const {return this->fully_read;}	
 	size_t get_bytes_read() const {return this->bytes_read;}
+	bool get_conflict_bool() const  { return this->has_conflict; }	
+
+	string get_remote_file_path();
+	string get_local_file_path();
 
 
 	void set_path(string path) { this->path = path;}	
@@ -75,9 +80,10 @@ public:
 	void set_can_sync(bool status)  { this->can_sync = status;}	
 	void set_fully_read(bool status)  { this->fully_read = status;}	
 	void increase_bytes_read(size_t bytes) { this->bytes_read+=bytes;}
+	void set_conflict_bool(bool status)  { this->has_conflict = status;}	
 
 
-	void populate_buffer(vector<byte> data); 
+	void populate_buffer(const vector<byte> &data); 
 	void clear_buffer();
 
     /**

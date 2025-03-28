@@ -36,9 +36,14 @@ printify.sh
 
 /data/all_fil*.md
 /data
-
+# Lexi
 /Tests/LexiTests/*txt
-
+/wow*
+/wow/*.txt
+datap.sh
 .vscode/
 
 SyncTester*
+
+
+

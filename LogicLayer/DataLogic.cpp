@@ -1,11 +1,13 @@
 #include "DataLogic.h"
+#include "ConflictLogic.h"
 
 #include "../UILayer/IOHandler.h"
 
 
-DataLogic::DataLogic(FileLogic *fileLogic, NetworkLogic *networkLogic){
+DataLogic::DataLogic(FileLogic *fileLogic, NetworkLogic *networkLogic, ConflictLogic *conflictLogic){
     this->fileLogic = fileLogic;
     this->networkLogic = networkLogic;
+    this->conflictLogic = conflictLogic;
 }
 
 //=================================================================//
@@ -76,6 +78,8 @@ DataModel *DataLogic::collect_files(CommandModel *commandModel){
     // cout << "Mark syncable files to DataModel" << endl;
     dataModel = this->mark_syncable_files(dataModel, commandModel);
 
+    // Let's grab some conflicts and resolve em
+    this->conflictLogic->mark_conlicting_files(dataModel);
     
     //--- Printing Data Model Pretty! ---//
     cout << *dataModel << endl;
@@ -94,7 +98,6 @@ DataModel *DataLogic::write_data(DataModel *dataModel, CommandModel *commandMode
     if (dataModel == nullptr) throw runtime_error("!Error: Failed writing to remote files.");
     
 
-    
     // Throw messages to main to print more info for user
     return dataModel;
 }

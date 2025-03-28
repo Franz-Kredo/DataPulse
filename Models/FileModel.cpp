@@ -6,9 +6,17 @@ FileModel::FileModel(const string& path, const string& relative_file_path, size_
         : path(path), relative_file_path(relative_file_path), size(size)
 	{
 
-	}
 
-void FileModel::populate_buffer(vector<byte> data){ 
+}
+
+string FileModel::get_remote_file_path(){
+    return this->get_remote_path() + "/" + this->get_name();
+}
+string FileModel::get_local_file_path(){
+    return this->get_path() + "/" + this->get_name();
+}
+
+void FileModel::populate_buffer(const vector<byte>& data){ 
     this->buffer = data;
 }	
 void FileModel::clear_buffer() {

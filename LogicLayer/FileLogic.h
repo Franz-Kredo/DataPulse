@@ -10,6 +10,7 @@
 #include <cstddef>
 #include <fstream>
 #include <libssh/sftp.h>
+#include <chrono>
 using namespace std;
 
 
@@ -59,7 +60,10 @@ public:
      * and writes the contents of the FileModel's buffer to the remote file.
      */
     void write_remote_data(FileModel* fileModel, SftpSessionModel *sftpSessionModel);
-
+    
+    // Only used to resolve conflicts of files
+    time_t get_local_last_modified(FileModel *fileModel);
+    time_t get_remote_last_modified(FileModel *fileModel, SftpSessionModel *sftpSessionModel);
 private:
     /**
      * @brief Retrieves the size of a remote file via SFTP.

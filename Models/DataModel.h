@@ -19,8 +19,8 @@ public:
 
     void add_local_files(vector<FileModel*> *file_models);
     void add_remote_files(vector<FileModel*> *file_models);
-    unordered_map<string, FileModel*> get_local_files(){return this->local_files;}
-    unordered_map<string, FileModel*> get_remote_files(){return this->remote_files;}
+    unordered_map<string, FileModel*>& get_local_files(){return this->local_files;}
+    unordered_map<string, FileModel*>& get_remote_files(){return this->remote_files;}
 
 
 
