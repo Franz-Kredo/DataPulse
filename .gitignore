@@ -38,7 +38,7 @@ printify.sh
 /data
 # Lexi
 /Tests/LexiTests/*txt
-/wow*
+/sync_test*
 /wow/*.txt
 datap.sh
 .vscode/
