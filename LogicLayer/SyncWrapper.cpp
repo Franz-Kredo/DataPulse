@@ -14,9 +14,7 @@ SyncWrapper::SyncWrapper(CommandModel *commandModel){
     this->conflictLogic = new ConflictLogic(this->fileLogic, this->networkLogic);
     this->dataLogic = new DataLogic(this->fileLogic, this->networkLogic, this->conflictLogic);
 }
-DataModel *SyncWrapper::sync_and_resolve_conflict(){
-        // this->networkLogic = new NetworkLogic(commandModel);
-        // this->networkLogic->list_remote_directory(this->commandModel);
+DataModel *SyncWrapper::initialize_files(){
         // Collect data locally and remotely
         return this->dataLogic->collect_files(this->commandModel);
 }

@@ -50,7 +50,7 @@ public:
      */
     bool verify_sync(DataModel *oldDataModel);
     
-    DataModel *sync_and_resolve_conflict();
+    DataModel *initialize_files();
     // string sync_with_remote(DataModel *dataModel);
 };
 
