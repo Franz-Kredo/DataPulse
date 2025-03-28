@@ -22,11 +22,8 @@ public:
     unordered_map<string, FileModel*>& get_local_files(){return this->local_files;}
     unordered_map<string, FileModel*>& get_remote_files(){return this->remote_files;}
 
-
-
     // Add a verification method that checks for syncable files.
     // bool verify_syncable_files() const;
-
 
     // Member print method that outputs the contents of the DataModel
     void print(ostream &os) const;
