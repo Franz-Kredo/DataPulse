@@ -55,17 +55,17 @@ bool DataLogic::compare_synced_data(DataModel *dataModel, CommandModel *commandM
             // local_file->set_can_sync(true);
         }
 
-        // if(!is_merge){ // should be if(is_merge), I'm doing if(!is_merge) for testing
-        //     string local_md5 = compute_md5_local(local_file->get_local_file_path());
-        //     string remote_md5 = compute_md5_remote(this->networkLogic->sftpSession, remote_files[relative_path]->get_remote_file_path());
+        if(is_merge){ // should be if(is_merge), I'm doing if(!is_merge) for testing
+            string local_md5 = compute_md5_local(local_file->get_local_file_path());
+            string remote_md5 = compute_md5_remote(this->networkLogic->sftpSession, remote_files[relative_path]->get_remote_file_path());
 
-        //     if (local_md5 == remote_md5) {
-        //         std::cout << "Files are identical based on MD5 checksum." << std::endl;
-        //     } else {
-        //         std::cout << "Files differ at " << relative_path << std::endl;
-        //         all_good = false;
-        //     }
-        // }
+            if (local_md5 == remote_md5) {
+                std::cout << "Files are identical based on MD5 checksum." << std::endl;
+            } else {
+                std::cout << "Files differ at " << relative_path << std::endl;
+                all_good = false;
+            }
+        }
 
     }
     //--- Going through all remote files to mark files that don't exist locally ---//
@@ -77,17 +77,17 @@ bool DataLogic::compare_synced_data(DataModel *dataModel, CommandModel *commandM
             cout << "Some sync issue with: " << relative_path << endl;
             all_good = false;
         }
-        // if(!is_merge){ // should be if(is_merge), I'm doing if(!is_merge) for testing
-        //     string remote_md5 = compute_md5_remote(this->networkLogic->sftpSession, remote_file->get_local_file_path());
-        //     string local_md5 = compute_md5_local(remote_files[relative_path]->get_local_file_path());
+        if(is_merge){ // should be if(is_merge), I'm doing if(!is_merge) for testing
+            string remote_md5 = compute_md5_remote(this->networkLogic->sftpSession, remote_file->get_local_file_path());
+            string local_md5 = compute_md5_local(remote_files[relative_path]->get_local_file_path());
 
-        //     if (local_md5 == remote_md5) {
-        //         std::cout << "Files are identical based on MD5 checksum." << std::endl;
-        //     } else {
-        //         std::cout << "Files differ at " << relative_path << std::endl;
-        //         all_good = false;
-        //     }
-        // }
+            if (local_md5 == remote_md5) {
+                std::cout << "Files are identical based on MD5 checksum." << std::endl;
+            } else {
+                std::cout << "Files differ at " << relative_path << std::endl;
+                all_good = false;
+            }
+        }
     }
 
     return all_good;
@@ -183,9 +183,6 @@ DataModel *DataLogic::collect_files(CommandModel *commandModel){
     
     // cout << "Mark syncable files to DataModel" << endl;
     dataModel = this->mark_syncable_files(dataModel, commandModel);
-
-    // Let's grab some conflicts and resolve em
-    // this->conflictLogic->mark_conlicting_files(dataModel);
     
     //--- Printing Data Model Pretty! ---//
     cout << *dataModel << endl;
@@ -269,28 +266,23 @@ DataModel *DataLogic::write_local(DataModel *dataModel, CommandModel *commandMod
     unordered_map<string, FileModel *> remote_files = dataModel->get_remote_files();
 
     // Create logic for non-merge sync
-    // if(!commandModel->get_merge()){
-        for (const auto &pair : remote_files) {
-            const string &relative_path = pair.first;
-            FileModel* local_file = pair.second;
-            const bool can_sync = local_file->get_can_sync();
-            if(!can_sync)
-                continue;
-    
-            auto local_file_model = local_files.find(relative_path);
+    for (const auto &pair : remote_files) {
+        const string &relative_path = pair.first;
+        FileModel* local_file = pair.second;
+        const bool can_sync = local_file->get_can_sync();
+        if(!can_sync)
+            continue;
 
-            // If the file is not found locally (which we want), then write it locally
-            if(local_file_model == local_files.end()) {
-                while(!local_file->get_fully_read()){
-                    this->fileLogic->read_remote_data(local_file, this->networkLogic->sftpSession ,chunk_size);
-                    this->fileLogic->write_local_data(local_file);
-                }
+        auto local_file_model = local_files.find(relative_path);
+
+        // If the file is not found locally (which we want), then write it locally
+        if(local_file_model == local_files.end()) {
+            while(!local_file->get_fully_read()){
+                this->fileLogic->read_remote_data(local_file, this->networkLogic->sftpSession ,chunk_size);
+                this->fileLogic->write_local_data(local_file);
             }
         }
-    // } else {
-    //     cout << "[yet to be implemented] Here we would write files when doing a merge sync" << endl;
-    //     return nullptr;
-    // }
+    }
 
     return dataModel;
 }
@@ -303,27 +295,22 @@ DataModel *DataLogic::write_remote(DataModel *dataModel, CommandModel *commandMo
     unordered_map<string, FileModel *> remote_files = dataModel->get_remote_files();
 
     // Create logic for non-merge sync
-    // if(!commandModel->get_merge()){
-        for (const auto &pair : local_files) {
-            const string &relative_path = pair.first;
-            FileModel* local_file = pair.second;
-            const bool can_sync = local_file->get_can_sync();
-            if(!can_sync)
-                continue;
-    
-            auto remote_file_model = remote_files.find(relative_path);
-            // If the file is not found on remote (which we want), then write it on remote
-            if(remote_file_model == remote_files.end()) {
-                while(!local_file->get_fully_read()){
-                    this->fileLogic->read_local_data(local_file, chunk_size);
-                    this->fileLogic->write_remote_data(local_file, this->networkLogic->sftpSession);
-                }
+    for (const auto &pair : local_files) {
+        const string &relative_path = pair.first;
+        FileModel* local_file = pair.second;
+        const bool can_sync = local_file->get_can_sync();
+        if(!can_sync)
+            continue;
+
+        auto remote_file_model = remote_files.find(relative_path);
+        // If the file is not found on remote (which we want), then write it on remote
+        if(remote_file_model == remote_files.end()) {
+            while(!local_file->get_fully_read()){
+                this->fileLogic->read_local_data(local_file, chunk_size);
+                this->fileLogic->write_remote_data(local_file, this->networkLogic->sftpSession);
             }
         }
-    // } else {
-    //     cout << "[yet to be implemented] Here we would write files when doing a merge sync" << endl;
-    //     return nullptr;
-    // }
+    }
 
     return dataModel;
 }
