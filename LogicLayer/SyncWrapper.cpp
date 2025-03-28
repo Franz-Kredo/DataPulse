@@ -58,8 +58,6 @@ bool SyncWrapper::verify_sync(DataModel *oldDataModel){
     
     bool is_synced = this->dataLogic->compare_synced_data(dataModel, this->commandModel);
 
-    bool compare_data_models;
-
     return is_synced;
     
 }

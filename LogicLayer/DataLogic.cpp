@@ -6,6 +6,7 @@
 
 #include <openssl/md5.h>
 #include <fcntl.h>
+#include <openssl/evp.h>
 
 // #include <fstream>
 // #include <sstream>
@@ -95,13 +96,47 @@ bool DataLogic::compare_synced_data(DataModel *dataModel, CommandModel *commandM
 
 
 
+// string DataLogic::compute_md5_local(const std::string& file_path) {
+//     unsigned char digest[MD5_DIGEST_LENGTH];
+//     MD5_CTX ctx;
+//     MD5_Init(&ctx);
+
+//     std::ifstream file(file_path, std::ios::binary);
+//     if (!file) {
+//         throw std::runtime_error("Cannot open local file: " + file_path);
+//     }
+    
+//     const size_t buffer_size = 8192;
+//     std::vector<char> buffer(buffer_size);
+//     while (file.good()) {
+//         file.read(buffer.data(), buffer.size());
+//         MD5_Update(&ctx, buffer.data(), file.gcount());
+//     }
+//     file.close();
+
+//     MD5_Final(digest, &ctx);
+
+//     std::stringstream ss;
+//     for (int i = 0; i < MD5_DIGEST_LENGTH; ++i) {
+//         ss << std::hex << std::setw(2) << std::setfill('0') << (int)digest[i];
+//     }
+//     return ss.str();
+// }
+
+
 string DataLogic::compute_md5_local(const std::string& file_path) {
-    unsigned char digest[MD5_DIGEST_LENGTH];
-    MD5_CTX ctx;
-    MD5_Init(&ctx);
+    EVP_MD_CTX *mdctx = EVP_MD_CTX_new();
+    if (!mdctx) 
+        throw std::runtime_error("EVP_MD_CTX_new failed");
+
+    if (1 != EVP_DigestInit_ex(mdctx, EVP_md5(), nullptr)) {
+        EVP_MD_CTX_free(mdctx);
+        throw std::runtime_error("EVP_DigestInit_ex failed");
+    }
 
     std::ifstream file(file_path, std::ios::binary);
     if (!file) {
+        EVP_MD_CTX_free(mdctx);
         throw std::runtime_error("Cannot open local file: " + file_path);
     }
     
@@ -109,52 +144,114 @@ string DataLogic::compute_md5_local(const std::string& file_path) {
     std::vector<char> buffer(buffer_size);
     while (file.good()) {
         file.read(buffer.data(), buffer.size());
-        MD5_Update(&ctx, buffer.data(), file.gcount());
+        std::streamsize count = file.gcount();
+        if (count > 0) {
+            if (1 != EVP_DigestUpdate(mdctx, buffer.data(), count)) {
+                EVP_MD_CTX_free(mdctx);
+                throw std::runtime_error("EVP_DigestUpdate failed");
+            }
+        }
     }
     file.close();
 
-    MD5_Final(digest, &ctx);
+    unsigned char digest[EVP_MAX_MD_SIZE];
+    unsigned int digest_len = 0;
+    if (1 != EVP_DigestFinal_ex(mdctx, digest, &digest_len)) {
+        EVP_MD_CTX_free(mdctx);
+        throw std::runtime_error("EVP_DigestFinal_ex failed");
+    }
+    EVP_MD_CTX_free(mdctx);
 
     std::stringstream ss;
-    for (int i = 0; i < MD5_DIGEST_LENGTH; ++i) {
+    for (unsigned int i = 0; i < digest_len; ++i) {
         ss << std::hex << std::setw(2) << std::setfill('0') << (int)digest[i];
     }
     return ss.str();
 }
 
+// string DataLogic::compute_md5_remote(SftpSessionModel *sftpSessionModel, const std::string& remote_path) {
+//     sftp_session sftp = sftpSessionModel->get();
+//     sftp_file file = sftp_open(sftp, remote_path.c_str(), O_RDONLY, 0);
+//     if (!file) {
+//         throw std::runtime_error("Cannot open remote file: " + remote_path);
+//     }
+    
+//     unsigned char digest[MD5_DIGEST_LENGTH];
+//     MD5_CTX ctx;
+//     MD5_Init(&ctx);
+    
+//     const size_t buffer_size = 8192;
+//     std::vector<char> buffer(buffer_size);
+//     int bytes_read;
+    
+//     while ((bytes_read = sftp_read(file, buffer.data(), buffer.size())) > 0) {
+//         MD5_Update(&ctx, buffer.data(), bytes_read);
+//     }
+//     if (bytes_read < 0) {
+//         sftp_close(file);
+//         throw std::runtime_error("Error reading remote file: " + remote_path);
+//     }
+    
+//     sftp_close(file);
+//     MD5_Final(digest, &ctx);
+
+//     std::stringstream ss;
+//     for (int i = 0; i < MD5_DIGEST_LENGTH; ++i) {
+//         ss << std::hex << std::setw(2) << std::setfill('0') << (int)digest[i];
+//     }
+//     return ss.str();
+// }
 
 string DataLogic::compute_md5_remote(SftpSessionModel *sftpSessionModel, const std::string& remote_path) {
     sftp_session sftp = sftpSessionModel->get();
     sftp_file file = sftp_open(sftp, remote_path.c_str(), O_RDONLY, 0);
     if (!file) {
-        throw std::runtime_error("Cannot open remote file: " + remote_path);
+        throw runtime_error("Cannot open remote file: " + remote_path);
     }
     
-    unsigned char digest[MD5_DIGEST_LENGTH];
-    MD5_CTX ctx;
-    MD5_Init(&ctx);
+    EVP_MD_CTX *mdctx = EVP_MD_CTX_new();
+    if (!mdctx) {
+        sftp_close(file);
+        throw runtime_error("EVP_MD_CTX_new failed");
+    }
+    if (1 != EVP_DigestInit_ex(mdctx, EVP_md5(), nullptr)) {
+        EVP_MD_CTX_free(mdctx);
+        sftp_close(file);
+        throw runtime_error("EVP_DigestInit_ex failed");
+    }
     
     const size_t buffer_size = 8192;
     std::vector<char> buffer(buffer_size);
     int bytes_read;
-    
     while ((bytes_read = sftp_read(file, buffer.data(), buffer.size())) > 0) {
-        MD5_Update(&ctx, buffer.data(), bytes_read);
+        if (1 != EVP_DigestUpdate(mdctx, buffer.data(), bytes_read)) {
+            EVP_MD_CTX_free(mdctx);
+            sftp_close(file);
+            throw runtime_error("EVP_DigestUpdate failed");
+        }
     }
     if (bytes_read < 0) {
+        EVP_MD_CTX_free(mdctx);
         sftp_close(file);
-        throw std::runtime_error("Error reading remote file: " + remote_path);
+        throw runtime_error("Error reading remote file: " + remote_path);
     }
     
     sftp_close(file);
-    MD5_Final(digest, &ctx);
+    unsigned char digest[EVP_MAX_MD_SIZE];
+    unsigned int digest_len = 0;
+    if (1 != EVP_DigestFinal_ex(mdctx, digest, &digest_len)) {
+        EVP_MD_CTX_free(mdctx);
+        throw runtime_error("EVP_DigestFinal_ex failed");
+    }
+    EVP_MD_CTX_free(mdctx);
 
     std::stringstream ss;
-    for (int i = 0; i < MD5_DIGEST_LENGTH; ++i) {
+    for (unsigned int i = 0; i < digest_len; ++i) {
         ss << std::hex << std::setw(2) << std::setfill('0') << (int)digest[i];
     }
     return ss.str();
 }
+
 
 //================================================================//
 //=============== PUBLIC READING & WRITING METHODS ===============//
