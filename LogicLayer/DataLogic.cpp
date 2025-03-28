@@ -4,15 +4,26 @@
 #include "../UILayer/IOHandler.h"
 
 
+#include <openssl/md5.h>
+#include <fcntl.h>
+#include <openssl/evp.h>
+
+// #include <fstream>
+// #include <sstream>
+// #include <iomanip>
+// #include <vector>
+// #include <stdexcept>
+
+
 DataLogic::DataLogic(FileLogic *fileLogic, NetworkLogic *networkLogic, ConflictLogic *conflictLogic){
     this->fileLogic = fileLogic;
     this->networkLogic = networkLogic;
     this->conflictLogic = conflictLogic;
 }
 
-//=================================================================//
-//===================== PUBLIC COMPARE METHOD =====================//
-//=================================================================//
+//==================================================================//
+//===================== PUBLIC COMPARE METHODS =====================//
+//==================================================================//
 
 bool DataLogic::compare_synced_data(DataModel *dataModel, CommandModel *commandModel){
     IOHandler::output_subtitle("Comparing synced data...", "blue");
@@ -21,6 +32,19 @@ bool DataLogic::compare_synced_data(DataModel *dataModel, CommandModel *commandM
     unordered_map<string, FileModel*> remote_files = dataModel->get_remote_files();
     
     bool all_good = true;
+    bool is_merge = commandModel->get_merge();
+
+    // if(!is_merge){
+    //     std::string local_md5 = compute_md5_local(commandModel->get_local_dir_path());
+    //     std::string remote_md5 = compute_md5_remote(this->networkLogic->sftpSession, commandModel->get_remote_dir_path());
+
+    //     if (local_md5 == remote_md5) {
+    //         std::cout << "Files are identical based on MD5 checksum." << std::endl;
+    //     } else {
+    //         std::cout << "Files differ." << std::endl;
+    //         all_good = false;
+    //     }
+    // }
 
     for (const auto &pair : local_files) {
         const string &relative_path = pair.first;
@@ -31,6 +55,19 @@ bool DataLogic::compare_synced_data(DataModel *dataModel, CommandModel *commandM
             all_good = false;
             // local_file->set_can_sync(true);
         }
+
+        if(is_merge){ // should be if(is_merge), I'm doing if(!is_merge) for testing
+            string local_md5 = compute_md5_local(local_file->get_local_file_path());
+            string remote_md5 = compute_md5_remote(this->networkLogic->sftpSession, remote_files[relative_path]->get_remote_file_path());
+
+            if (local_md5 == remote_md5) {
+                std::cout << "Files are identical based on MD5 checksum." << std::endl;
+            } else {
+                std::cout << "Files differ at " << relative_path << std::endl;
+                all_good = false;
+            }
+        }
+
     }
     //--- Going through all remote files to mark files that don't exist locally ---//
     for (const auto &pair : remote_files) {
@@ -41,6 +78,17 @@ bool DataLogic::compare_synced_data(DataModel *dataModel, CommandModel *commandM
             cout << "Some sync issue with: " << relative_path << endl;
             all_good = false;
         }
+        if(is_merge){ // should be if(is_merge), I'm doing if(!is_merge) for testing
+            string remote_md5 = compute_md5_remote(this->networkLogic->sftpSession, remote_file->get_local_file_path());
+            string local_md5 = compute_md5_local(remote_files[relative_path]->get_local_file_path());
+
+            if (local_md5 == remote_md5) {
+                std::cout << "Files are identical based on MD5 checksum." << std::endl;
+            } else {
+                std::cout << "Files differ at " << relative_path << std::endl;
+                all_good = false;
+            }
+        }
     }
 
     return all_good;
@@ -48,6 +96,161 @@ bool DataLogic::compare_synced_data(DataModel *dataModel, CommandModel *commandM
 
 
 
+// string DataLogic::compute_md5_local(const std::string& file_path) {
+//     unsigned char digest[MD5_DIGEST_LENGTH];
+//     MD5_CTX ctx;
+//     MD5_Init(&ctx);
+
+//     std::ifstream file(file_path, std::ios::binary);
+//     if (!file) {
+//         throw std::runtime_error("Cannot open local file: " + file_path);
+//     }
+    
+//     const size_t buffer_size = 8192;
+//     std::vector<char> buffer(buffer_size);
+//     while (file.good()) {
+//         file.read(buffer.data(), buffer.size());
+//         MD5_Update(&ctx, buffer.data(), file.gcount());
+//     }
+//     file.close();
+
+//     MD5_Final(digest, &ctx);
+
+//     std::stringstream ss;
+//     for (int i = 0; i < MD5_DIGEST_LENGTH; ++i) {
+//         ss << std::hex << std::setw(2) << std::setfill('0') << (int)digest[i];
+//     }
+//     return ss.str();
+// }
+
+
+string DataLogic::compute_md5_local(const std::string& file_path) {
+    EVP_MD_CTX *mdctx = EVP_MD_CTX_new();
+    if (!mdctx) 
+        throw std::runtime_error("EVP_MD_CTX_new failed");
+
+    if (1 != EVP_DigestInit_ex(mdctx, EVP_md5(), nullptr)) {
+        EVP_MD_CTX_free(mdctx);
+        throw std::runtime_error("EVP_DigestInit_ex failed");
+    }
+
+    std::ifstream file(file_path, std::ios::binary);
+    if (!file) {
+        EVP_MD_CTX_free(mdctx);
+        throw std::runtime_error("Cannot open local file: " + file_path);
+    }
+    
+    const size_t buffer_size = 8192;
+    std::vector<char> buffer(buffer_size);
+    while (file.good()) {
+        file.read(buffer.data(), buffer.size());
+        std::streamsize count = file.gcount();
+        if (count > 0) {
+            if (1 != EVP_DigestUpdate(mdctx, buffer.data(), count)) {
+                EVP_MD_CTX_free(mdctx);
+                throw std::runtime_error("EVP_DigestUpdate failed");
+            }
+        }
+    }
+    file.close();
+
+    unsigned char digest[EVP_MAX_MD_SIZE];
+    unsigned int digest_len = 0;
+    if (1 != EVP_DigestFinal_ex(mdctx, digest, &digest_len)) {
+        EVP_MD_CTX_free(mdctx);
+        throw std::runtime_error("EVP_DigestFinal_ex failed");
+    }
+    EVP_MD_CTX_free(mdctx);
+
+    std::stringstream ss;
+    for (unsigned int i = 0; i < digest_len; ++i) {
+        ss << std::hex << std::setw(2) << std::setfill('0') << (int)digest[i];
+    }
+    return ss.str();
+}
+
+// string DataLogic::compute_md5_remote(SftpSessionModel *sftpSessionModel, const std::string& remote_path) {
+//     sftp_session sftp = sftpSessionModel->get();
+//     sftp_file file = sftp_open(sftp, remote_path.c_str(), O_RDONLY, 0);
+//     if (!file) {
+//         throw std::runtime_error("Cannot open remote file: " + remote_path);
+//     }
+    
+//     unsigned char digest[MD5_DIGEST_LENGTH];
+//     MD5_CTX ctx;
+//     MD5_Init(&ctx);
+    
+//     const size_t buffer_size = 8192;
+//     std::vector<char> buffer(buffer_size);
+//     int bytes_read;
+    
+//     while ((bytes_read = sftp_read(file, buffer.data(), buffer.size())) > 0) {
+//         MD5_Update(&ctx, buffer.data(), bytes_read);
+//     }
+//     if (bytes_read < 0) {
+//         sftp_close(file);
+//         throw std::runtime_error("Error reading remote file: " + remote_path);
+//     }
+    
+//     sftp_close(file);
+//     MD5_Final(digest, &ctx);
+
+//     std::stringstream ss;
+//     for (int i = 0; i < MD5_DIGEST_LENGTH; ++i) {
+//         ss << std::hex << std::setw(2) << std::setfill('0') << (int)digest[i];
+//     }
+//     return ss.str();
+// }
+
+string DataLogic::compute_md5_remote(SftpSessionModel *sftpSessionModel, const std::string& remote_path) {
+    sftp_session sftp = sftpSessionModel->get();
+    sftp_file file = sftp_open(sftp, remote_path.c_str(), O_RDONLY, 0);
+    if (!file) {
+        throw runtime_error("Cannot open remote file: " + remote_path);
+    }
+    
+    EVP_MD_CTX *mdctx = EVP_MD_CTX_new();
+    if (!mdctx) {
+        sftp_close(file);
+        throw runtime_error("EVP_MD_CTX_new failed");
+    }
+    if (1 != EVP_DigestInit_ex(mdctx, EVP_md5(), nullptr)) {
+        EVP_MD_CTX_free(mdctx);
+        sftp_close(file);
+        throw runtime_error("EVP_DigestInit_ex failed");
+    }
+    
+    const size_t buffer_size = 8192;
+    std::vector<char> buffer(buffer_size);
+    int bytes_read;
+    while ((bytes_read = sftp_read(file, buffer.data(), buffer.size())) > 0) {
+        if (1 != EVP_DigestUpdate(mdctx, buffer.data(), bytes_read)) {
+            EVP_MD_CTX_free(mdctx);
+            sftp_close(file);
+            throw runtime_error("EVP_DigestUpdate failed");
+        }
+    }
+    if (bytes_read < 0) {
+        EVP_MD_CTX_free(mdctx);
+        sftp_close(file);
+        throw runtime_error("Error reading remote file: " + remote_path);
+    }
+    
+    sftp_close(file);
+    unsigned char digest[EVP_MAX_MD_SIZE];
+    unsigned int digest_len = 0;
+    if (1 != EVP_DigestFinal_ex(mdctx, digest, &digest_len)) {
+        EVP_MD_CTX_free(mdctx);
+        throw runtime_error("EVP_DigestFinal_ex failed");
+    }
+    EVP_MD_CTX_free(mdctx);
+
+    std::stringstream ss;
+    for (unsigned int i = 0; i < digest_len; ++i) {
+        ss << std::hex << std::setw(2) << std::setfill('0') << (int)digest[i];
+    }
+    return ss.str();
+}
 
 
 //================================================================//
@@ -77,9 +280,6 @@ DataModel *DataLogic::collect_files(CommandModel *commandModel){
     
     // cout << "Mark syncable files to DataModel" << endl;
     dataModel = this->mark_syncable_files(dataModel, commandModel);
-
-    // Let's grab some conflicts and resolve em
-    // this->conflictLogic->mark_conlicting_files(dataModel);
     
     //--- Printing Data Model Pretty! ---//
     cout << *dataModel << endl;
@@ -157,33 +357,28 @@ DataModel *DataLogic::mark_syncable_files(DataModel *dataModel, CommandModel *co
 DataModel *DataLogic::write_local(DataModel *dataModel, CommandModel *commandModel){
     cout << "DataLogic::write_local() was called" << endl;
     
-    size_t chunk_size = 8;
+    size_t chunk_size = 16384;
     
     unordered_map<string, FileModel *> local_files = dataModel->get_local_files();
     unordered_map<string, FileModel *> remote_files = dataModel->get_remote_files();
 
     // Create logic for non-merge sync
-    if(!commandModel->get_merge()){
-        for (const auto &pair : remote_files) {
-            const string &relative_path = pair.first;
-            FileModel* local_file = pair.second;
-            const bool can_sync = local_file->get_can_sync();
-            if(!can_sync)
-                continue;
-    
-            auto local_file_model = local_files.find(relative_path);
+    for (const auto &pair : remote_files) {
+        const string &relative_path = pair.first;
+        FileModel* local_file = pair.second;
+        const bool can_sync = local_file->get_can_sync();
+        if(!can_sync)
+            continue;
 
-            // If the file is not found locally (which we want), then write it locally
-            if(local_file_model == local_files.end()) {
-                while(!local_file->get_fully_read()){
-                    this->fileLogic->read_remote_data(local_file, this->networkLogic->sftpSession ,chunk_size);
-                    this->fileLogic->write_local_data(local_file);
-                }
+        auto local_file_model = local_files.find(relative_path);
+
+        // If the file is not found locally (which we want), then write it locally
+        if(local_file_model == local_files.end()) {
+            while(!local_file->get_fully_read()){
+                this->fileLogic->read_remote_data(local_file, this->networkLogic->sftpSession ,chunk_size);
+                this->fileLogic->write_local_data(local_file);
             }
         }
-    } else {
-        cout << "[yet to be implemented] Here we would write files when doing a merge sync" << endl;
-        return nullptr;
     }
 
     return dataModel;
@@ -191,32 +386,27 @@ DataModel *DataLogic::write_local(DataModel *dataModel, CommandModel *commandMod
 
 
 DataModel *DataLogic::write_remote(DataModel *dataModel, CommandModel *commandModel){
-    size_t chunk_size = 8;
+    size_t chunk_size = 16384;
     
     unordered_map<string, FileModel *> local_files = dataModel->get_local_files();
     unordered_map<string, FileModel *> remote_files = dataModel->get_remote_files();
 
     // Create logic for non-merge sync
-    if(!commandModel->get_merge()){
-        for (const auto &pair : local_files) {
-            const string &relative_path = pair.first;
-            FileModel* local_file = pair.second;
-            const bool can_sync = local_file->get_can_sync();
-            if(!can_sync)
-                continue;
-    
-            auto remote_file_model = remote_files.find(relative_path);
-            // If the file is not found on remote (which we want), then write it on remote
-            if(remote_file_model == remote_files.end()) {
-                while(!local_file->get_fully_read()){
-                    this->fileLogic->read_local_data(local_file, chunk_size);
-                    this->fileLogic->write_remote_data(local_file, this->networkLogic->sftpSession);
-                }
+    for (const auto &pair : local_files) {
+        const string &relative_path = pair.first;
+        FileModel* local_file = pair.second;
+        const bool can_sync = local_file->get_can_sync();
+        if(!can_sync)
+            continue;
+
+        auto remote_file_model = remote_files.find(relative_path);
+        // If the file is not found on remote (which we want), then write it on remote
+        if(remote_file_model == remote_files.end()) {
+            while(!local_file->get_fully_read()){
+                this->fileLogic->read_local_data(local_file, chunk_size);
+                this->fileLogic->write_remote_data(local_file, this->networkLogic->sftpSession);
             }
         }
-    } else {
-        cout << "[yet to be implemented] Here we would write files when doing a merge sync" << endl;
-        return nullptr;
     }
 
     return dataModel;

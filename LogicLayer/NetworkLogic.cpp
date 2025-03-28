@@ -6,6 +6,12 @@
 
 NetworkLogic::NetworkLogic(CommandModel *commandModel)
 {
+    this->commandModel = commandModel;
+    this->sftpSession = this->generate_sftp_session(this->commandModel);
+}
+
+
+SftpSessionModel *NetworkLogic::generate_sftp_session(CommandModel *commandModel){
     ssh_session sshSession = ssh_new();
     if (!sshSession) throw runtime_error("!Failed to create SSH session");
 
@@ -14,19 +20,21 @@ NetworkLogic::NetworkLogic(CommandModel *commandModel)
     ssh_options_set(sshSession, SSH_OPTIONS_USER, commandModel->get_username().c_str());
     ssh_options_set(sshSession, SSH_OPTIONS_ADD_IDENTITY, commandModel->get_priv_key_path().c_str());
 
-    if (ssh_connect(sshSession) != SSH_OK)
-        throw runtime_error("!SSH connection failed: " + string(ssh_get_error(sshSession)));
+    if (ssh_connect(sshSession) != SSH_OK){
+        cout << "Something went wrong while trying to connect via ssh..." << endl;
+        return nullptr;
+    }
     if (ssh_userauth_publickey_auto(sshSession, nullptr, nullptr) != SSH_AUTH_SUCCESS) {
         // Maybe add logic to check if the key is encrypted to store in model?
         // That way we only prompt for password if the body of the key is encrypted?
         string passphrase = this->prompt_hidden("Enter passphrase for key '" + commandModel->get_priv_key_path() + "':");
         if (ssh_userauth_publickey_auto(sshSession, nullptr, passphrase.c_str()) != SSH_AUTH_SUCCESS) {
-            throw runtime_error("!SSH authentication failed" + string(ssh_get_error(sshSession)));
+            cout << "Something went wrong while trying to connect via ssh..." << endl;
+            return nullptr;
+        }
     }
-}
 
-    this->sftpSession = new SftpSessionModel(sshSession);
-    this->commandModel = commandModel;
+    return new SftpSessionModel(sshSession);
 }
 
 
