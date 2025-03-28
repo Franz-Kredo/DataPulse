@@ -26,29 +26,30 @@ NetworkLogic::NetworkLogic(CommandModel *commandModel)
 }
 
     this->sftpSession = new SftpSessionModel(sshSession);
+    this->commandModel = commandModel;
 }
 
 
 // Testing func
-void NetworkLogic::list_remote_directory(CommandModel *commandModel) {
-    sftp_dir dir = sftp_opendir(this->sftpSession->get(), commandModel->get_remote_dir_path().c_str());
-    if (!dir) throw runtime_error("Unable to open remote directory: " + commandModel->get_remote_dir_path());
+// void NetworkLogic::list_remote_directory(CommandModel *commandModel) {
+//     sftp_dir dir = sftp_opendir(this->sftpSession->get(), commandModel->get_remote_dir_path().c_str());
+//     if (!dir) throw runtime_error("Unable to open remote directory: " + commandModel->get_remote_dir_path());
 
-    sftp_attributes attrs;
-    while ((attrs = sftp_readdir(this->sftpSession->get(), dir)) != nullptr) {
-        if (attrs->type == SSH_FILEXFER_TYPE_REGULAR) {
-            cout << "File: " << attrs->name << "\t\t\t";
-            cout << "  Size: " << attrs->size << " bytes\t";
-            cout << "  Permissions: "
-                      << ((attrs->permissions & S_IRUSR) ? 'r' : '-')
-                      << ((attrs->permissions & S_IWUSR) ? 'w' : '-')
-                      << ((attrs->permissions & S_IXUSR) ? 'x' : '-')
-                      << endl;
-        }
-        sftp_attributes_free(attrs);
-    }
-    sftp_closedir(dir);
-}
+//     sftp_attributes attrs;
+//     while ((attrs = sftp_readdir(this->sftpSession->get(), dir)) != nullptr) {
+//         if (attrs->type == SSH_FILEXFER_TYPE_REGULAR) {
+//             cout << "File: " << attrs->name << "\t\t\t";
+//             cout << "  Size: " << attrs->size << " bytes\t";
+//             cout << "  Permissions: "
+//                       << ((attrs->permissions & S_IRUSR) ? 'r' : '-')
+//                       << ((attrs->permissions & S_IWUSR) ? 'w' : '-')
+//                       << ((attrs->permissions & S_IXUSR) ? 'x' : '-')
+//                       << endl;
+//         }
+//         sftp_attributes_free(attrs);
+//     }
+//     sftp_closedir(dir);
+// }
 
 // Built from stackoverflow post, not sure where to put this, it is storing a password after all.
 string NetworkLogic::prompt_hidden(string const &prompt) {

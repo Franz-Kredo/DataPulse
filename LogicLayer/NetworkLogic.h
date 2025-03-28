@@ -9,9 +9,9 @@ using std::string;
 
 
 class NetworkLogic{
-    public:
+public:
     SftpSessionModel *sftpSession;
-
+    CommandModel*commandModel;
     
     NetworkLogic(CommandModel *commandModel);
 
@@ -24,15 +24,10 @@ class NetworkLogic{
      * @param commandModel Instance of CommandModel containing the remote directory path.
      * @throws runtime_error if the remote directory cannot be opened.
      */
-    void list_remote_directory(CommandModel *commandModel);
+    // void list_remote_directory(CommandModel *commandModel); // Possibly not in use since it's a test function
 
 
-    // string sftp_read_from_remote();
-    // string sftp_write_to_remote();
-
-    // sftp_read_from_remote
 private:
-
     /**
      * @brief Prompts the user for sensitive input (e.g., a passphrase) without echoing the input to the terminal.
      *
@@ -42,7 +37,6 @@ private:
      * @return The input string entered by the user.
      */
     string prompt_hidden(string const &prompt);
-
 };
 
 

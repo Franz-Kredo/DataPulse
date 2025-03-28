@@ -43,7 +43,7 @@ public:
 	string get_path() const {return this->path;}	
 	string get_remote_path() const {return this->remote_path;}	
 	// string get_name() const {return this->name;}	
-	// string get_name() const {return filesystem::path(this->relative_file_path).filename().string();} // Collect the name using the relative path
+	string get_name() const {return filesystem::path(this->relative_file_path).filename().string();} // Collect the name using the relative path
     
 	size_t get_size() const {return this->size;}	
 	bool get_read_perm() const {return this->read_perm;}	
@@ -80,10 +80,21 @@ public:
 	void populate_buffer(vector<byte> data); 
 	void clear_buffer();
 
-    /*
-     * @brief Generates a FileModel based on CommandModel 
+    /**
+     * @brief Generates a FileModel based on local files found using the CommandModel 
+     * 
+     * @param commandModel: An instance of CommandModel
+     * @param relative_file_path: A file path relative to the sync directory
      */
     static FileModel *populate_local_file_model(CommandModel *commandModel, string relative_file_path);	
+
+    /**
+     * @brief Generates a FileModel based on remote files found using the CommandModel 
+     * 
+     * @param commandModel: An instance of CommandModel
+     * @param relative_file_path: A file path relative to the sync directory
+     * @param file_size: The size of the remote file
+     */
     static FileModel *populate_remote_file_model(CommandModel *commandModel, string relative_file_path, size_t file_size);	
 
 private:

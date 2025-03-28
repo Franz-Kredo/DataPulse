@@ -1,10 +1,51 @@
 #include "DataLogic.h"
 
+#include "../UILayer/IOHandler.h"
+
 
 DataLogic::DataLogic(FileLogic *fileLogic, NetworkLogic *networkLogic){
     this->fileLogic = fileLogic;
     this->networkLogic = networkLogic;
 }
+
+//=================================================================//
+//===================== PUBLIC COMPARE METHOD =====================//
+//=================================================================//
+
+bool DataLogic::compare_synced_data(DataModel *dataModel, CommandModel *commandModel){
+    IOHandler::output_subtitle("Comparing synced data...", "blue");
+
+    unordered_map<string, FileModel*> local_files = dataModel->get_local_files();
+    unordered_map<string, FileModel*> remote_files = dataModel->get_remote_files();
+    
+    bool all_good = true;
+
+    for (const auto &pair : local_files) {
+        const string &relative_path = pair.first;
+        FileModel* local_file = pair.second;
+        auto remote_file_model = remote_files.find(relative_path);
+        if(remote_file_model == remote_files.end()) {
+            cout << "Some sync issue with: " << relative_path << endl;
+            all_good = false;
+            // local_file->set_can_sync(true);
+        }
+    }
+    //--- Going through all remote files to mark files that don't exist locally ---//
+    for (const auto &pair : remote_files) {
+        const string &relative_path = pair.first;
+        FileModel* remote_file = pair.second;
+        auto local_file_model = local_files.find(relative_path);
+        if(local_file_model == local_files.end()) {
+            cout << "Some sync issue with: " << relative_path << endl;
+            all_good = false;
+        }
+    }
+
+    return all_good;
+}
+
+
+
 
 
 //================================================================//

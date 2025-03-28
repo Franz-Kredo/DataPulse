@@ -24,6 +24,10 @@ public:
 
 
 
+    // Add a verification method that checks for syncable files.
+    // bool verify_syncable_files() const;
+
+
     // Member print method that outputs the contents of the DataModel
     void print(ostream &os) const;
     friend ostream& operator<<(ostream &os, const DataModel &dataModel);

@@ -1,12 +1,7 @@
 #include <iostream>
-// using std::byte;
 
-
-
-#include <libssh/libssh.h>
 #include "UILayer/IOHandler.h"
 #include "LogicLayer/SyncWrapper.h"
-// #include "LogicLayer/NetworkLogic.h"
 #include "Tests/LexiTests/TestHandler.h"
 
 
@@ -22,22 +17,15 @@ int main(int argc, const char * argv[]) {
 
     SyncWrapper *syncWrapper;
 
-    // bool is_valid = IOHandler::is_network_command(argc, argv);
     CommandModel *networkCommandModel = IOHandler::is_network_command(argc, argv);
     bool is_help_command = IOHandler::is_help_command(argc, argv);
-
-    // cout << "is_valid: " << is_valid << endl;
-    // cout << "is_network_command: " << networkCommandModel << endl;
-    // cout << "is_help_command: " << is_help_command << endl;
     
     if(networkCommandModel) {
         syncWrapper = new SyncWrapper(networkCommandModel);
         
         ret_msg = syncWrapper->sync_with_remote();
-        
-        // This might break since the NetworkLogic may or may not be initiated
-        syncWrapper->networkLogic->list_remote_directory(networkCommandModel);
 
+        // Change color of the text box if there is ! at the start of the string
         if (!ret_msg.empty() && ret_msg[0] == '!') {
             ret_msg.erase(0, 1);
             box_color = "pink";

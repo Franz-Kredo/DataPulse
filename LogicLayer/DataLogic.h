@@ -24,6 +24,10 @@ public:
 
     //---- Methods ----//
 
+    bool compare_synced_data(DataModel *dataModel, CommandModel *commandModel);
+
+
+
     /*
      * @brief Takes in CommandModel and collects local and remote file info and imports it to DataModel as FileModels
      *

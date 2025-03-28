@@ -38,6 +38,15 @@ public:
      * @return A string message indicating the outcome of the synchronization process.
      */
     string sync_with_remote();
+
+
+    /**
+     * @brief Can be used to verify a sync, making sure it properly went through
+     *
+     * @param oldDataModel: An instance of DataModel that was used while syncing
+     * @return A boolean wether the sync was successful or not
+     */
+    bool verify_sync(DataModel *oldDataModel);
 };
 
 #endif // SYNCWRAPPER_H
