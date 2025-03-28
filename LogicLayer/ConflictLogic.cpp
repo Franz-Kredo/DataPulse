@@ -18,19 +18,18 @@ string ConflictLogic::conflict_handler(int option, DataModel *dataModel, FileMod
 
     if (option == 1){
         this->overide_with_newer_file(dataModel, local_file, remote_file);
-        return "Merging.. keeping newer";
+        return "Merging... keeping newer";
 
     }else if (option == 2){
         this->overide_with_older_file(dataModel, local_file, remote_file);
-        return "Merging.. keeping older";
+        return "Merging... keeping older";
 
     }else if (option == 3){
         this->keep_both_files_auto_rename(dataModel, local_file, remote_file);
-        return "Merging.. renaming";
-
+        return "Merging... renaming";
     }else if (option == 4){
         this->omit_from_sync(local_file, remote_file);
-        return "Merging.. skipping sync";
+        return "Merging... skipping sync";
     }
     return "Merge failed for" + local_file->get_name();
 
@@ -86,12 +85,15 @@ void ConflictLogic::overide_with_older_file(DataModel *dataModel, FileModel *loc
 // Option 3, I know this is kind of insane whoops
 void ConflictLogic::keep_both_files_auto_rename(DataModel *dataModel, FileModel *local_file, FileModel *remote_file){
     SftpSessionModel *sftpSessionModel = this->networkLogic->sftpSession;
-    unordered_map<string, FileModel*>  local_files = dataModel->get_local_files();
-    unordered_map<string, FileModel*>  remote_files = dataModel->get_remote_files();
+    unordered_map<string, FileModel*>&  local_files = dataModel->get_local_files();
+    unordered_map<string, FileModel*>&  remote_files = dataModel->get_remote_files();
+
+    string old_local_key = local_file->get_relative_path();
+    string old_remote_key = local_file->get_relative_path();
 
     // string remote_file_path = remote_file->get_remote_path() + "/" + remote_file->get_name();
     string remote_file_path = remote_file->get_remote_file_path();
-    string new_remote_name = remote_file->get_name() + "_r";
+    string new_remote_name = remote_file->get_relative_path() + "_r";
     while (local_files.count(new_remote_name) != 0 && remote_files.count(new_remote_name) != 0)
         new_remote_name +="_r";
         
@@ -101,27 +103,41 @@ void ConflictLogic::keep_both_files_auto_rename(DataModel *dataModel, FileModel 
 
     // string local_file_path = local_file->get_path() + "/" + local_file->get_name();
     string local_file_path = local_file->get_local_file_path();
-    string new_local_name = local_file->get_name() + "_l";
+    string new_local_name = local_file->get_relative_path() + "_l";
     while (local_files.count(new_local_name) != 0 && remote_files.count(new_local_name) != 0)
         new_local_name +="_l";
 
     local_file->set_name(new_local_name);
     // string new_local_file_path = local_file->get_path() + "/" + new_local_name;
-    string new_local_file_path = local_file->get_path() + "/" + local_file->get_local_file_path();
+    string new_local_file_path = local_file->get_local_file_path();
+    cout << "Local rmote path: " << remote_file_path << endl;
+    cout << "New rmote file: " << new_remote_file_path << endl;
 
     int rc = sftp_rename(sftpSessionModel->get(), remote_file_path.c_str(), new_remote_file_path.c_str());
     if (rc < 0) 
         throw std::runtime_error("Failed to rename remote file.");
 
-    std::filesystem::rename(local_file_path, new_local_name);
+    cout << "Local file path: " << local_file_path << endl;
+    cout << "New local file: " << new_local_file_path << endl;
 
+    std::filesystem::rename(local_file_path, new_local_file_path);
+
+   
     local_file->set_name(new_local_name);
     local_file->set_can_sync(true);
     local_file->set_conflict_bool(false);
+    cout << "Old local key: " << old_local_key << endl;
+    cout << "New local key: " << local_file->get_relative_path() << endl;
+    this->_update_key_in_datmodel(old_local_key, local_file->get_relative_path(), local_files);
     
     remote_file->set_name(new_remote_name);
     remote_file->set_can_sync(true);
     remote_file->set_conflict_bool(false);
+    cout << "Old remote key: " << old_remote_key << endl;
+    cout << "New remote key: " << remote_file->get_relative_path() << endl;
+    this->_update_key_in_datmodel(old_remote_key, remote_file->get_relative_path(), remote_files);
+
+
 }
 
 // Option 4
@@ -131,7 +147,6 @@ void ConflictLogic::omit_from_sync(FileModel *local_file, FileModel *remote_file
 
     remote_file->set_can_sync(false);
     remote_file->set_conflict_bool(false);
-
 }
 
 //PRIVATES
@@ -178,5 +193,13 @@ void ConflictLogic::_overide_file(bool delete_remote, DataModel *dataModel, File
             delete local_file;
         remote_file->set_can_sync(true);
         remote_file->set_conflict_bool(false);
+    }
+}
+
+void ConflictLogic::_update_key_in_datmodel(string old_key, string new_key, unordered_map<string, FileModel*>& map){
+    auto node = map.extract(old_key);
+    if (!node.empty()) {
+        node.key() = new_key;
+        map.insert(std::move(node));
     }
 }
