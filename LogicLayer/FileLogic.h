@@ -25,6 +25,8 @@ public:
 private:
     size_t _get_remote_size(SftpSessionModel *sftpSessionModel, string file_name);
     void _update_model_with_data(FileModel *fileModel, const vector<byte> &buffer);
+    void ensure_remote_directories_exist(SftpSessionModel *sftpSessionModel, const string &full_file_path);
+
 };
 
 #endif // FILELOGIC_H

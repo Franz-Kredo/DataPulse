@@ -44,6 +44,14 @@ void FileLogic::read_local_data(FileModel* fileModel, size_t chunk_size){
 
 void FileLogic::write_local_data(FileModel* fileModel){
     string file_name = fileModel->get_path() + "/" + fileModel->get_relative_path(); 
+
+
+    // Create directory if it doesn't exist
+    filesystem::path filePath(file_name);
+    filesystem::path dirPath = filePath.parent_path();
+    if (!filesystem::exists(dirPath)){
+        filesystem::create_directories(dirPath);
+    }
     
     if (!filesystem::exists(file_name)){
         ofstream create(file_name, ios::binary);
@@ -107,11 +115,20 @@ void FileLogic::read_remote_data(FileModel* fileModel, SftpSessionModel *sftpSes
     this->_update_model_with_data(fileModel, buffer);
 }
 
+
 void FileLogic::write_remote_data(FileModel* fileModel, SftpSessionModel *sftpSessionModel) {
     string full_file_path = fileModel->get_remote_path() + "/" + fileModel->get_relative_path();
     sftp_session sftp = sftpSessionModel->get();
 
     // cout << "|=====| FileLogic::write_remote_data() -> full_file_path: " << full_file_path << endl;
+    // Make sure that remote directories exist
+    try {
+        this->ensure_remote_directories_exist(sftpSessionModel, full_file_path);
+    } catch (const std::exception &e) {
+        fileModel->set_write_perm(false);
+        cerr << "Failed to create remote directories: " << e.what() << endl;
+        return;
+    }
 
     // Always ensure file exists
     bool file_exists = sftp_stat(sftp, full_file_path.c_str()) != nullptr;
@@ -182,3 +199,48 @@ void FileLogic::_update_model_with_data(FileModel *fileModel, const vector<byte>
         fileModel->set_fully_read(true);
 }
 
+
+
+void FileLogic::ensure_remote_directories_exist(SftpSessionModel *sftpSessionModel, const string &full_file_path) {
+    sftp_session sftp = sftpSessionModel->get();
+    // Get the directory portion of the file path.
+    size_t pos = full_file_path.find_last_of("/");
+    if (pos == string::npos) return; // No directory part
+    string remote_dir = full_file_path.substr(0, pos);
+
+    // Split the directory path into its components.
+    vector<string> components;
+    size_t start = 0;
+    if (!remote_dir.empty() && remote_dir[0] == '/') {
+        start = 1; // skip leading '/'
+    }
+    while (start < remote_dir.size()) {
+        size_t end = remote_dir.find('/', start);
+        if (end == string::npos) {
+            components.push_back(remote_dir.substr(start));
+            break;
+        } else {
+            components.push_back(remote_dir.substr(start, end - start));
+            start = end + 1;
+        }
+    }
+
+    // Build the directory path step-by-step.
+    string currentPath;
+    if (!remote_dir.empty() && remote_dir[0] == '/') {
+        currentPath = "/";
+    }
+    for (const auto &comp : components) {
+        if (currentPath != "/" && !currentPath.empty()) {
+            currentPath += "/";
+        }
+        currentPath += comp;
+        // Check if the directory exists.
+        if (sftp_stat(sftp, currentPath.c_str()) == nullptr) {
+            // Create the directory
+            if (sftp_mkdir(sftp, currentPath.c_str(), S_IRWXU) != SSH_OK) {
+                throw runtime_error("Failed to create remote directory: " + currentPath);
+            }
+        }
+    }
+}
