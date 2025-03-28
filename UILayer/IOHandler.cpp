@@ -55,11 +55,10 @@ pair<int, bool> IOHandler::input_conflict_resolution_option() {
     }
 }
 
+
 bool IOHandler::file_exists(string &filepath) {
     struct stat sb;
 
-    // Calls the function with path as argument
-    // If the file/directory exists at the path, stat returns 0.
     if (stat(filepath.c_str(), &sb) == 0) {
         return true;
     } else {
@@ -67,6 +66,7 @@ bool IOHandler::file_exists(string &filepath) {
         return false;
     }
 }
+
 
 bool IOHandler::validate_unix_filepath(string &filepath){
     // Credits: Cjxcz Odjcayrwl on StackOverflow
@@ -76,15 +76,6 @@ bool IOHandler::validate_unix_filepath(string &filepath){
 
     return regex_match(filepath, linux_path_regex);;
 }
-
-//----- Command Line Argument Handler -----//
-bool IOHandler::is_valid(int argc, const char * argv[]){
-    // bool valid_net_command = IOHandler::is_network_command(argc, argv);
-    // bool valid_help_command = IOHandler::is_help_command(argc, argv);
-
-    // return (valid_net_command || valid_help_command);
-    return false;
-}  
 
 
 CommandModel *IOHandler::is_network_command(int argc, const char * argv[]){
@@ -205,12 +196,10 @@ Usage:
 Options:
   -h              Display this help message and exit.
   -m              Enable merge mode (if applicable).
-  -t              [pending] Tests the ssh/sftp connection.
 
 Usage with options:
   datapulse -h
   datapulse -m 192.168.50.42 remote_username /home/remote_username/someFolder /home/localuser/someOtherFolder /home/localuser/.ssh/priv_key
-  datapulse -t 192.168.50.42 remote_username /home/remote_username/someFolder /home/localuser/someOtherFolder /home/localuser/.ssh/priv_key
 
 Arguments:
   <host>         The remote host address (IP or domain name).

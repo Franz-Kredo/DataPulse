@@ -70,7 +70,7 @@ private:
      * @param commandModel: Takes in the an instance of CommandModel made from args from the terminal
      * @returns unordered_map<string, FileModel>: 
      */
-    unordered_map<string, FileModel>  *read_remote(CommandModel *commandModel);    
+    // unordered_map<string, FileModel>  *read_remote(CommandModel *commandModel);    
 
     /*
      * @brief Uses the DataModel determine which files are syncable, then return the dataModel with syncable files marked
