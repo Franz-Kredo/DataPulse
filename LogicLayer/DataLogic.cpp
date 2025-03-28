@@ -45,17 +45,17 @@ bool DataLogic::compare_synced_data(DataModel *dataModel, CommandModel *commandM
             // local_file->set_can_sync(true);
         }
 
-        // if(is_merge){ // should be if(is_merge), I'm doing if(!is_merge) for testing
-        //     string local_md5 = compute_md5_local(local_file->get_local_file_path());
-        //     string remote_md5 = compute_md5_remote(this->networkLogic->sftpSession, remote_files[relative_path]->get_remote_file_path());
+        if(is_merge){ // should be if(is_merge), I'm doing if(!is_merge) for testing
+            string local_md5 = compute_md5_local(local_file->get_local_file_path());
+            string remote_md5 = compute_md5_remote(this->networkLogic->sftpSession, remote_files[relative_path]->get_remote_file_path());
 
-        //     if (local_md5 == remote_md5) {
-        //         cout << "Files are identical based on MD5 checksum." << endl;
-        //     } else {
-        //         cout << "Files differ at " << relative_path << endl;
-        //         all_good = false;
-        //     }
-        // }
+            if (local_md5 == remote_md5) {
+                cout << "Files are identical based on MD5 checksum." << endl;
+            } else {
+                cout << "Files differ at " << relative_path << endl;
+                all_good = false;
+            }
+        }
 
     }
     //--- Going through all remote files to mark files that don't exist locally ---//
@@ -67,17 +67,17 @@ bool DataLogic::compare_synced_data(DataModel *dataModel, CommandModel *commandM
             cout << "Some sync issue with: " << relative_path << endl;
             all_good = false;
         }
-        // if(is_merge){ // should be if(is_merge), I'm doing if(!is_merge) for testing
-        //     string remote_md5 = compute_md5_remote(this->networkLogic->sftpSession, remote_file->get_local_file_path());
-        //     string local_md5 = compute_md5_local(remote_files[relative_path]->get_local_file_path());
+        if(is_merge){ // should be if(is_merge), I'm doing if(!is_merge) for testing
+            string remote_md5 = compute_md5_remote(this->networkLogic->sftpSession, remote_file->get_remote_file_path());
+            string local_md5 = compute_md5_local(remote_files[relative_path]->get_local_file_path());
 
-        //     if (local_md5 == remote_md5) {
-        //         cout << "Files are identical based on MD5 checksum." << endl;
-        //     } else {
-        //         cout << "Files differ at " << relative_path << endl;
-        //         all_good = false;
-        //     }
-        // }
+            if (local_md5 == remote_md5) {
+                cout << "Files are identical based on MD5 checksum." << endl;
+            } else {
+                cout << "Files differ at " << relative_path << endl;
+                all_good = false;
+            }
+        }
     }
 
     return all_good;
