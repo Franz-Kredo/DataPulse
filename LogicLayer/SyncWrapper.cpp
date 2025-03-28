@@ -1,4 +1,5 @@
 #include "SyncWrapper.h"
+#include "ConflictLogic.h"
 
 
 SyncWrapper::SyncWrapper(CommandModel *commandModel){
@@ -9,10 +10,18 @@ SyncWrapper::SyncWrapper(CommandModel *commandModel){
     catch (...) { cout << "An error occurred while creating networkLogic." << endl; } 
 
 
-    this->dataLogic = new DataLogic(this->fileLogic, this->networkLogic);
+    this->conflictLogic = new ConflictLogic(this->fileLogic, this->networkLogic);
+    this->dataLogic = new DataLogic(this->fileLogic, this->networkLogic, this->conflictLogic);
+}
+DataModel *SyncWrapper::sync_and_resolve_conflict(){
+        // this->networkLogic = new NetworkLogic(commandModel);
+        this->networkLogic->list_remote_directory(this->commandModel);
+        // Collect data locally and remotely
+        return this->dataLogic->collect_files(this->commandModel);
+
 }
 
-string SyncWrapper::sync_with_remote(){
+string SyncWrapper::sync_with_remote(DataModel *dataModel){
     // try {
     //     this->networkLogic = new NetworkLogic(commandModel);
     //     this->networkLogic->list_remote_directory(commandModel);
@@ -24,10 +33,10 @@ string SyncWrapper::sync_with_remote(){
     try {
         // Existing network logic initialization
         // this->networkLogic = new NetworkLogic(commandModel);
-        this->networkLogic->list_remote_directory(this->commandModel);
-        
+        //this->networkLogic->list_remote_directory(this->commandModel);
         // Collect data locally and remotely
-        DataModel *dataModel = this->dataLogic->collect_files(this->commandModel);
+        //DataModel *dataModel = this->dataLogic->collect_files(this->commandModel);
+
 
         // Write the syncable data to local and remote
         this->dataLogic->write_data(dataModel, commandModel);

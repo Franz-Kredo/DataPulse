@@ -70,6 +70,7 @@ public:
     // static void write_dialoge(string dialog);
     // static void write_story(string dialog);
     // INPUT METHODS
+    static pair<int, bool> input_conflict_resolution_option(); 
     static int input_choose_index(int size);
     static string input_choose_option(const vector<string> &options_list);
     static void input_continue();

@@ -23,12 +23,13 @@ public:
 
     void read_remote_data(FileModel* fileModel, SftpSessionModel *sftpSessionModel, size_t chunk_size);
     void write_remote_data(FileModel* fileModel, SftpSessionModel *sftpSessionModel);
+    // Only used to resolve conflicts of files
+    time_t get_local_last_modified(FileModel *fileModel);
+    time_t get_remote_last_modified(FileModel *fileModel, SftpSessionModel *sftpSessionModel);
 private:
     size_t _get_remote_size(SftpSessionModel *sftpSessionModel, string file_name);
     void _update_model_with_data(FileModel *fileModel, const vector<byte> &buffer);
 
-    time_t get_local_last_modified(FileModel *fileModel);
-    time_t get_remote_last_modified(FileModel *fileModel, SftpSessionModel *sftpSessionModel);
 
 };
 

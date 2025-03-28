@@ -16,7 +16,15 @@ FileModel::FileModel(const string& path, const std::string& name, std::size_t si
         : path(path), name(name), size(size)
 	{
 
-	}
+
+}
+
+string FileModel::get_remote_file_path(){
+    return this->get_remote_path() + "/" + this->get_name();
+}
+string FileModel::get_local_file_path(){
+    return this->get_path() + "/" + this->get_name();
+}
 
 void FileModel::populate_buffer(const vector<byte>& data){ 
     this->buffer = data;

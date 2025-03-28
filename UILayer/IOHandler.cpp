@@ -32,6 +32,29 @@ int IOHandler::msg_padding_len = 5;
 
 //============= DATAPULE SPECIFIC METHODS =============//
 
+pair<int, bool> IOHandler::input_conflict_resolution_option() {
+    string input;
+    regex valid_input_regex("^[1-4]a?$");
+    bool has_a = false; 
+    string option_out = "(1)Keep newer/(2)keep older/(3)keep both rename/(4)do not synce/(a) suffix apply to all)";
+
+    while (true) {
+        cout << option_out << endl;
+        cout << "Enter option (1-4 or 1a-4a): ";
+        cin >> input;
+
+        if (regex_match(input, valid_input_regex)) {
+            if (input.back() == 'a') {
+                has_a = true;
+                input.pop_back();
+            }
+            return {stoi(input), has_a};
+        } else {
+            cout << "Forbidden command. Try again.\n";
+        }
+    }
+}
+
 bool IOHandler::file_exists(string &filepath) {
     struct stat sb;
 

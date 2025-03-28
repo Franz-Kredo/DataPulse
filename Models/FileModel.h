@@ -51,6 +51,9 @@ public:
 	size_t get_bytes_read() const {return this->bytes_read;}
 	bool get_conflict_bool() const  { return this->has_conflict; }	
 
+	string get_remote_file_path();
+	string get_local_file_path();
+
 
 	void set_path(string path) { this->path = path;}	
 	void set_remote_path(string path) { this->remote_path = path;}	

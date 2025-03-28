@@ -5,6 +5,7 @@
 
 #include "../Models/CommandModel.h"
 
+#include "ConflictLogic.h"
 #include "DataLogic.h"
 #include "NetworkLogic.h"
 #include "FileLogic.h"
@@ -22,11 +23,13 @@ public:
     DataLogic *dataLogic;
     NetworkLogic *networkLogic;
     FileLogic *fileLogic;
+    ConflictLogic *conflictLogic;
     
     SyncWrapper(CommandModel *commandModel);
 
     //---- Methods ----//
-    string sync_with_remote();
+    DataModel *sync_and_resolve_conflict();
+    string sync_with_remote(DataModel *dataModel);
 };
 
 #endif // SYNCWRAPPER_H

@@ -2,6 +2,7 @@
 #ifndef DATALOGIC_H
 #define DATALOGIC_H
 
+#include "ConflictLogic.h"
 #include "FileLogic.h"
 #include "NetworkLogic.h"
 
@@ -17,8 +18,9 @@ class DataLogic{
 public:
     FileLogic *fileLogic;
     NetworkLogic *networkLogic;
+    ConflictLogic *conflictLogic;
 
-    DataLogic(FileLogic *fileLogic, NetworkLogic *networkLogic);
+    DataLogic(FileLogic *fileLogic, NetworkLogic *networkLogic, ConflictLogic *conflictLogic);
     
     // DataLogic(FileLogic *fileLogic);
 
