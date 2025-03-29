@@ -1,5 +1,6 @@
 #include "DataLogic.h"
-
+#include <set>
+#include <string>
 
 DataLogic::DataLogic(FileLogic *fileLogic, NetworkLogic *networkLogic){
     this->fileLogic = fileLogic;
@@ -18,11 +19,12 @@ bool DataLogic::compare_synced_data(DataModel *dataModel, CommandModel *commandM
     bool all_good = true;
     bool is_merge = commandModel->get_merge();
     if(is_merge){
-        cout << "Files:" << endl;
+        cout << "File MD5 Checksum:" << endl;
     }
 
     // unordered_map<string, string>
 
+    std::set<string> file_set;
     for (const auto &pair : local_files) {
         const string &relative_path = pair.first;
         FileModel* local_file = pair.second;
@@ -35,10 +37,11 @@ bool DataLogic::compare_synced_data(DataModel *dataModel, CommandModel *commandM
             string remote_md5 = compute_md5_remote(this->networkLogic->sftpSession, remote_files[relative_path]->get_remote_file_path());
 
             if (local_md5 == remote_md5) {
-                // cout << "Files at " << relative_path << " are identical based on MD5 checksum." << endl;
                 cout << relative_path << "\t-\tSame" << endl;
+                file_set.insert(relative_path);
             } else {
                 cout << relative_path << "\t-\tDifferent" << endl;
+                file_set.insert(relative_path);
             }
         }
         else if(remote_file_model == remote_files.end()) {
@@ -57,10 +60,15 @@ bool DataLogic::compare_synced_data(DataModel *dataModel, CommandModel *commandM
         if(is_merge){ // should be if(is_merge), I'm doing if(!is_merge) for testing
             string remote_md5 = compute_md5_remote(this->networkLogic->sftpSession, remote_file->get_remote_file_path());
             string local_md5 = compute_md5_local(remote_files[relative_path]->get_local_file_path());
+            if (local_md5 == remote_md5 && file_set.count(relative_path) == 0){
+                cout << relative_path << "\t-\tSame" << endl;
+            }else if (file_set.count(relative_path) == 0){
+                cout << relative_path << "\t-\tDifferent" << endl;
 
             if (local_md5 == remote_md5) {
                 // cout << "Files at " << relative_path << " are identical based on MD5 checksum." << endl;
             } 
+            }
         }
         else if(local_file_model == local_files.end()) {
             cout << "Some sync issue with: " << relative_path << endl;
