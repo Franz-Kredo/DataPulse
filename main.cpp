@@ -31,7 +31,13 @@ void conflict_resolver(SyncWrapper *syncWrapper, DataModel *dataModel){
         try{
             string message = syncWrapper->conflictLogic->conflict_handler(opt, dataModel, local_file, remote_file);
             cout << message << endl;
-        } catch(...){
+        } 
+        catch (const runtime_error &e) {
+            cerr << "!Runtime error occurred: " << e.what() << endl; 
+            
+        }
+        
+        catch(...){
             cout << "We fucked up in syncWrapper->conflictLogic->conflict_handler(opt, dataModel, local_file, remote_file);..." << endl;
         }
         

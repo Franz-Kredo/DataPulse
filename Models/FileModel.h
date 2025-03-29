@@ -28,7 +28,7 @@ class FileModel {
 	size_t size;
 	bool read_perm;
 	bool write_perm;
-	bool can_sync = false;
+	bool can_sync = true;
 	vector<byte> buffer;
 	size_t bytes_read = 0;
 	bool fully_read = false;

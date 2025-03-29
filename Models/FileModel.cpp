@@ -7,9 +7,27 @@ FileModel::FileModel(const string& path, const string& relative_file_path, size_
 	{
 }
 
-string FileModel::get_remote_file_path(){
-    return this->get_remote_path() + "/" + this->get_relative_path();
+// string FileModel::get_remote_file_path(){
+//     return this->get_remote_path() + "/" + this->get_relative_path();
+// }
+string FileModel::get_remote_file_path() {
+    string remote_path = this->get_remote_path();
+    string relative_path = this->get_relative_path();
+    
+    // Remove trailing slash from remote_path if present
+    if (!remote_path.empty() && remote_path.back() == '/') {
+        remote_path.pop_back();
+    }
+    
+    // Remove leading slash from relative_path if present
+    if (!relative_path.empty() && relative_path.front() == '/') {
+        relative_path = relative_path.substr(1);
+    }
+    
+    return remote_path + "/" + relative_path;
 }
+
+
 string FileModel::get_local_file_path(){
     return this->get_path() + "/" + this->get_relative_path();
 }

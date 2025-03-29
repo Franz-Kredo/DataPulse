@@ -28,11 +28,14 @@ bool DataLogic::compare_synced_data(DataModel *dataModel, CommandModel *commandM
         FileModel* local_file = pair.second;
         auto remote_file_model = remote_files.find(relative_path);
         if(is_merge){
+            cout << "Calling MD5 2" << endl; 
+            cout << "local_file->get_local_file_path(): " << local_file->get_local_file_path() << endl;
+            cout << "remote_files[relative_path]->get_remote_file_path(): " << remote_files[relative_path]->get_remote_file_path() << endl;
             string local_md5 = compute_md5_local(local_file->get_local_file_path());
             string remote_md5 = compute_md5_remote(this->networkLogic->sftpSession, remote_files[relative_path]->get_remote_file_path());
 
             if (local_md5 == remote_md5) {
-                cout << "Files at " << relative_path << " are identical based on MD5 checksum." << endl;
+                // cout << "Files at " << relative_path << " are identical based on MD5 checksum." << endl;
                 cout << relative_path << "\t-\tSame" << endl;
             } else {
                 cout << relative_path << "\t-\tDifferent" << endl;
@@ -56,7 +59,7 @@ bool DataLogic::compare_synced_data(DataModel *dataModel, CommandModel *commandM
             string local_md5 = compute_md5_local(remote_files[relative_path]->get_local_file_path());
 
             if (local_md5 == remote_md5) {
-                cout << "Files at " << relative_path << " are identical based on MD5 checksum." << endl;
+                // cout << "Files at " << relative_path << " are identical based on MD5 checksum." << endl;
             } 
         }
         else if(local_file_model == local_files.end()) {
@@ -326,17 +329,21 @@ vector<FileModel*> *DataLogic::collect_local_files(CommandModel *commandModel){
 
     string local_path = commandModel->get_local_dir_path();
     // for (const auto & entry : filesystem::directory_iterator(local_path)){
+    // cout << "before collecting local files... " << endl;
     for (const auto &entry : filesystem::recursive_directory_iterator(local_path)) {
         if (!filesystem::is_regular_file(entry))
             continue; // Skip directories or other non-file entries
 
         string relative_path = filesystem::relative(entry.path(), local_path).string();
 
+        // cout << "local: relative_path => " << relative_path << endl;
+
         FileModel *fileModel = FileModel::populate_local_file_model(commandModel, relative_path);
         // cout << relative_path << endl; 
 
         all_file_models->push_back(fileModel);
     }
+    // cout << "after collecting local files... " << endl;
 
     return all_file_models;
 }
@@ -381,6 +388,8 @@ void DataLogic::collect_remote_files_recursive(sftp_session sftp, const string &
             string relative_path = full_path.substr(base_path.size());
             if (!relative_path.empty() && relative_path[0] == '/')
                 relative_path = relative_path.substr(1);
+
+            // cout << "remote: relative_path => " << relative_path << endl;
             
             FileModel *fileModel = FileModel::populate_remote_file_model(commandModel, relative_path, attrs->size);
             files.push_back(fileModel);

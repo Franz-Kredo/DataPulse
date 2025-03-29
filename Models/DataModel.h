@@ -17,6 +17,13 @@ public:
 	DataModel();
     	~DataModel() = default;
 
+    // ~DataModel() {
+    //     for (auto &pair : local_files)
+    //         delete pair.second;
+    //     for (auto &pair : remote_files)
+    //         delete pair.second;
+    // }
+
     void add_local_files(vector<FileModel*> *file_models);
     void add_remote_files(vector<FileModel*> *file_models);
     unordered_map<string, FileModel*>& get_local_files(){return this->local_files;}

@@ -89,32 +89,62 @@ void ConflictLogic::keep_both_files_auto_rename(DataModel *dataModel, FileModel 
     unordered_map<string, FileModel*>&  remote_files = dataModel->get_remote_files();
 
     string old_local_key = local_file->get_relative_path();
-    string old_remote_key = local_file->get_relative_path();
-
+    string old_remote_key = remote_file->get_relative_path();
+    // cout << "SILLY DUCK - 1" << endl;
     // string remote_file_path = remote_file->get_remote_path() + "/" + remote_file->get_name();
     string remote_file_path = remote_file->get_remote_file_path();
-    string new_remote_name = remote_file->get_relative_path() + "_r";
+    // string new_remote_name = remote_file->get_relative_path() + "_r";
+
+    // cout << "1 new_remote_name: " << remote_file->get_name() << endl;
+    string new_remote_name = remote_file->get_name() + "_r";
+    // cout << "2 new_remote_name: " << new_remote_name << endl;
+
     while (local_files.count(new_remote_name) != 0 && remote_files.count(new_remote_name) != 0)
         new_remote_name +="_r";
         
+    // cout << "SILLY DUCK - 2" << endl;
+    // cout << "\n\nCRACK TIME1!: local_file->get_relative_path(): " <<remote_file->get_relative_path() << endl;
     remote_file->set_name(new_remote_name);
+    // cout << "CRACK TIME2!: local_file->get_relative_path(): " <<remote_file->get_relative_path() << endl << endl << endl;
     // string new_remote_file_path = remote_file->get_remote_path() + "/" + new_remote_name;
     string new_remote_file_path = remote_file->get_remote_file_path();
 
     // string local_file_path = local_file->get_path() + "/" + local_file->get_name();
     string local_file_path = local_file->get_local_file_path();
-    string new_local_name = local_file->get_relative_path() + "_l";
+    string new_local_name = local_file->get_name() + "_l";
     while (local_files.count(new_local_name) != 0 && remote_files.count(new_local_name) != 0)
         new_local_name +="_l";
 
+    // cout << "\n\nBUNNY TIME1!: local_file->get_relative_path(): " <<local_file->get_relative_path() << endl;
     local_file->set_name(new_local_name);
+    // cout << "BUNNY TIME2!: local_file->get_relative_path(): " <<local_file->get_relative_path() << endl << endl << endl;
     // string new_local_file_path = local_file->get_path() + "/" + new_local_name;
     string new_local_file_path = local_file->get_local_file_path();
 
+    
     int rc = sftp_rename(sftpSessionModel->get(), remote_file_path.c_str(), new_remote_file_path.c_str());
-    if (rc < 0) 
-        throw std::runtime_error("Failed to rename remote file.");
+    // int rc = sftp_rename(this->networkLogic->sftpSession->get(), remote_file_path.c_str(), new_remote_name.c_str());
+    // cout << "SILLY DUCK - 4" << endl;
+    if (rc < 0) {
+        // cout << "SILLY DUCK - 5" << endl;
+        // throw std::runtime_error("Failed to rename remote file.");
+        // std::string err_msg = ssh_get_error(sftpSessionModel->get());
+        // std::string err_msg = ssh_get_error(this->networkLogic->sftpSession->get());
+        // throw std::runtime_error("Failed to rename remote file. SFTP error: " + err_msg);
 
+        int error_code = sftp_get_error(this->networkLogic->sftpSession->get());
+        const char *err_str = ssh_get_error(this->networkLogic->sftpSession->get());  // or use a dedicated SFTP error retrieval if available
+        // std::cout << "\n\n\nSFTP Error: " << err_str << std::endl;
+
+
+        // cout << "\n\n\n\nerr_str: " << err_str << endl;
+        throw std::runtime_error("Failed to rename remote file. Error code: " + std::to_string(error_code) + " Error: " + err_str);
+    }
+    // cout << "SILLY DUCK - 6" << endl;
+
+
+    // cout << "\n\nlocal_file_path: " << local_file_path << endl;
+    // cout << "new_local_file_path" << new_local_file_path << endl;
 
     std::filesystem::rename(local_file_path, new_local_file_path);
 
@@ -123,6 +153,7 @@ void ConflictLogic::keep_both_files_auto_rename(DataModel *dataModel, FileModel 
     local_file->set_can_sync(true);
     local_file->set_conflict_bool(false);
     this->_update_key_in_datmodel(old_local_key, local_file->get_relative_path(), local_files);
+    
     
     remote_file->set_name(new_remote_name);
     remote_file->set_can_sync(true);
@@ -144,6 +175,7 @@ void ConflictLogic::omit_from_sync(FileModel *local_file, FileModel *remote_file
 //PRIVATES
 
 bool ConflictLogic::_is_conflict(FileModel *local_file, FileModel *remote_file){
+    // cout << "local_file filepath: " <<
     string local_md5 = this->dataLogic->compute_md5_local(local_file->get_local_file_path());
     string remote_md5 = this->dataLogic->compute_md5_remote(this->networkLogic->sftpSession, remote_file->get_remote_file_path());
     return (local_md5 != remote_md5);
