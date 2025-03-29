@@ -22,64 +22,31 @@ TARGET = datap
 all: $(TARGET)
 
 # Link object files to create the main executable
-$(TARGET): $(OBJFILES)
+$(TARGET):clean $(OBJFILES)
 	@echo "Linking object files to create executable..."
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $(TARGET) $(OBJFILES) $(LIBS)
 
-# Debug build: clean first, compile with debug flags, then launch gdb
-debug: clean
-	@echo "Building debug version..."
-	$(CXX) $(CXXFLAGS) $(CXXDEBUGFLAGS) $(INCLUDES) -o debug.out $(SRC_FILES) $(LIBS)
-	gdb --args ./debug.out 192.168.42.125 franz /home/franz/pa5 /home/franz/github_repos/DataPulse/SyncTester /home/franz/.ssh/pa5
+# # Debug build: clean first, compile with debug flags, then launch gdb
+# debug: clean
+# 	@echo "Building debug version..."
+# 	$(CXX) $(CXXFLAGS) $(CXXDEBUGFLAGS) $(INCLUDES) -o debug.out $(SRC_FILES) $(LIBS)
+# 	gdb --args ./debug.out 192.168.42.125 franz /home/franz/pa5 /home/franz/github_repos/DataPulse/SyncTester /home/franz/.ssh/pa5
 
-# Run the executable
-run: $(TARGET)
-	./$(TARGET) 192.168.42.125 franz /home/franz/pa5 /home/franz/github_repos/DataPulse/SyncTester /home/franz/.ssh/pa5 
+# # Run the executable
+# run: $(TARGET)
+# 	./$(TARGET) 192.168.42.125 franz /home/franz/pa5 /home/franz/github_repos/DataPulse/SyncTester /home/franz/.ssh/pa5 
 
-# Run the executable
-run2: $(TARGET)
-	./$(TARGET) -m 192.168.42.125 franz /home/franz/pa5 /home/franz/github_repos/DataPulse/SyncTester /home/franz/.ssh/pa5 
+# # Run the executable
+# merge: $(TARGET)
+# 	./$(TARGET) -m 192.168.42.125 franz /home/franz/pa5 /home/franz/github_repos/DataPulse/SyncTester /home/franz/.ssh/pa5 
 
-# Run tests for the is_help_command method
-help:clean $(TARGET)
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $(TARGET) $(OBJFILES) $(LIBS)
-	@echo "\n\n\n============================================================="
-	@echo "============== Running Valid Help Command Tests ==============="
-	@echo "============================================================="
-	@echo "\n\n====== Running Help Test 1 ======"
-	./$(TARGET) -h
-	@echo "\n\n====== Running Valid Help Test 2 (long flag, filled with spaces 1) ======"
-	./$(TARGET) - h
-	@echo "\n\n====== Running Valid Help Test 3 (long flag, filled with spaces 2) ======"
-	./$(TARGET) -h 
-	@echo "\n\n====== Running Valid Help Test 4 (long flag, filled with spaces 3) ======"
-	./$(TARGET)  -h
-	@echo "\n\n====== Running Valid Help Test 5 (long flag, filled with spaces 4) ======"
-	./$(TARGET)        -h
-	@echo "\n\n\n==============================================================="
-	@echo "============== Running Invalid Net Command Tests =============="
-	@echo "==============================================================="
-	@echo "\n\n====== Running Invalid Help Test 6 (Too many letters 1) ======"
-	./$(TARGET) -hx
-	@echo "\n\n====== Running Invalid Help Test 7 (Too many letters) ======"
-	./$(TARGET) x-h
-	@echo "\n\n====== Running Invalid Help Test 8 (Invalid flag) ======"
-	./$(TARGET) -m
+# # Run tests for the is_help_command method
+# help: $(TARGET)
+# 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $(TARGET) $(OBJFILES) $(LIBS)
+# 	@echo "\n\n====== Running Help ======"
+# 	./$(TARGET) -h
 
-# "short" target: incremental build that compiles only changed source files
-short: $(OBJFILES)
-	@echo "Linking object files to create executable..."
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $(TARGET) $(OBJFILES) $(LIBS)
-	./$(TARGET)
-
-# Fast: run the executable without rebuilding
-fast:
-	./$(TARGET) 192.168.42.125 franz /home/franz/pa5 /home/franz/github_repos/DataPulse/SyncTester
-
-# Deb: launch debugger on the debug build
-deb:
-	gdb --args ./debug.out 192.168.42.125 franz /home/franz/pa5 /home/franz/github_repos/DataPulse/SyncTester
-
+ 
 # Pattern rule: compile any .cpp file into a .o file
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
