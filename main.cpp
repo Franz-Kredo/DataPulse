@@ -69,7 +69,8 @@ int main(int argc, const char * argv[]) {
         // This might break since the NetworkLogic may or may not be initiated
         try{
             syncWrapper = new SyncWrapper(networkCommandModel);
-            if(syncWrapper->networkLogic->sftpSession == nullptr){
+            // if(syncWrapper->networkLogic->sftpSession == nullptr){
+            if (!syncWrapper->networkLogic) {
                 return 0;
             }
         } 
