@@ -16,6 +16,10 @@ void conflict_resolver(SyncWrapper *syncWrapper, DataModel *dataModel){
     vector<FileModel*> local_conflicts = syncWrapper->conflictLogic->mark_conlicting_files(dataModel);
     for (FileModel* local_file : local_conflicts){
         FileModel *remote_file = remote_files[local_file->get_relative_path()];
+        auto remote_it = remote_files.find(local_file->get_relative_path());
+        if (remote_it == remote_files.end()) {
+            continue; //TODO TESTING MEMORY LEAK 2
+        }
         if(!apply_to_all){
             cout << local_file->get_name() +" Conflicting" << endl;
             cout << "\n\nChoose_how_to_resolve" << endl;
@@ -96,6 +100,7 @@ int main(int argc, const char * argv[]) {
             ret_msg.erase(0, 1);
             box_color = "pink";
         }    
+        delete dataModel;
     } 
     else if(is_help_command) {
         ret_msg = "The help page should be displayed here.";
@@ -108,6 +113,10 @@ int main(int argc, const char * argv[]) {
     }
     
     IOHandler::output_title(ret_msg, box_color);
+
+
+    delete syncWrapper;
+    delete networkCommandModel;
 
     return 0;
 }

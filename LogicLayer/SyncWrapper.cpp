@@ -3,17 +3,53 @@
 #include "ConflictLogic.h"
 
 
-SyncWrapper::SyncWrapper(CommandModel *commandModel){
+// SyncWrapper::SyncWrapper(CommandModel *commandModel){
+//     this->commandModel = commandModel;
+//     this->fileLogic = new FileLogic();
+    
+//     try{ this->networkLogic = new NetworkLogic(commandModel); }
+//     catch (...) { cout << "An error occurred while creating networkLogic." << endl; } 
+
+
+//     this->dataLogic = new DataLogic(this->fileLogic, this->networkLogic);
+//     this->conflictLogic = new ConflictLogic(this->fileLogic, this->networkLogic, this->dataLogic);
+// }
+SyncWrapper::SyncWrapper(CommandModel *commandModel) {
     this->commandModel = commandModel;
     this->fileLogic = new FileLogic();
+    this->networkLogic = nullptr;
+    this->dataLogic = nullptr;
+    this->conflictLogic = nullptr;
     
-    try{ this->networkLogic = new NetworkLogic(commandModel); }
-    catch (...) { cout << "An error occurred while creating networkLogic." << endl; } 
-
-
-    this->dataLogic = new DataLogic(this->fileLogic, this->networkLogic);
-    this->conflictLogic = new ConflictLogic(this->fileLogic, this->networkLogic, this->dataLogic);
+    try {
+        this->networkLogic = new NetworkLogic(commandModel);
+        
+        if (this->networkLogic && this->networkLogic->sftpSession) {
+            this->dataLogic = new DataLogic(this->fileLogic, this->networkLogic);
+            this->conflictLogic = new ConflictLogic(this->fileLogic, this->networkLogic, this->dataLogic);
+        } else {
+            cout << "Failed to establish connection." << endl;
+            // Cleanup
+            delete this->fileLogic;
+            this->fileLogic = nullptr;
+            
+            delete this->networkLogic;
+            this->networkLogic = nullptr;
+        }
+    } catch (const exception &e) {
+        cout << "An error occurred while creating networkLogic: " << e.what() << endl;
+        
+        // Clean up any resources that were allocated
+        delete this->fileLogic;
+        this->fileLogic = nullptr;
+        
+        // Re-throw the exception
+        throw;
+    }
 }
+
+
+
 DataModel *SyncWrapper::initialize_files(){
         // Collect data locally and remotely
         return this->dataLogic->collect_files(this->commandModel);
@@ -57,6 +93,8 @@ bool SyncWrapper::verify_sync(DataModel *oldDataModel){
     DataModel *dataModel = this->dataLogic->collect_files(this->commandModel, false);
     
     bool is_synced = this->dataLogic->compare_synced_data(dataModel, this->commandModel);
+
+    delete dataModel;
 
     return is_synced;
     

@@ -18,6 +18,9 @@ class SftpSessionModel {
 public:
 	explicit SftpSessionModel(ssh_session ssh);
     	~SftpSessionModel();
+
+
+        
     	sftp_session get() const { return sftp_sesh; }
 
 private:

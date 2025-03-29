@@ -184,6 +184,7 @@ bool ConflictLogic::_is_conflict(FileModel *local_file, FileModel *remote_file){
     // return true;
 }
 
+
 void ConflictLogic::_overide_file(bool delete_remote, DataModel *dataModel, FileModel *local_file, FileModel *remote_file) {
     SftpSessionModel *sftpSessionModel = this->networkLogic->sftpSession;
     unordered_map<string, FileModel*>&  local_files = dataModel->get_local_files();

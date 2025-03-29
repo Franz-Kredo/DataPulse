@@ -27,12 +27,31 @@ public:
     
     SyncWrapper(CommandModel *commandModel);
 
-    // SyncWrapper::~SyncWrapper() {
-    //     delete fileLogic;
-    //     delete networkLogic;
-    //     delete dataLogic;
-    //     delete conflictLogic;
-    // }
+    ~SyncWrapper() {
+        // delete fileLogic;
+        // delete networkLogic;
+        // delete dataLogic;
+        // delete conflictLogic;
+        if (networkLogic) {
+            delete networkLogic;
+            networkLogic = nullptr;
+        }
+        
+        if (fileLogic) {
+            delete fileLogic;
+            fileLogic = nullptr;
+        }
+        
+        if (dataLogic) {
+            delete dataLogic;
+            dataLogic = nullptr;
+        }
+        
+        if (conflictLogic) {
+            delete conflictLogic;
+            conflictLogic = nullptr;
+        }
+    }
 
     //---- Methods ----//
 

@@ -15,6 +15,12 @@ public:
     
     NetworkLogic(CommandModel *commandModel);
 
+    ~NetworkLogic() {
+        if (sftpSession) {
+            delete sftpSession;
+            sftpSession = nullptr;
+        }
+    }
     /**
      * @brief Lists the contents of the remote directory specified in the CommandModel.
      *

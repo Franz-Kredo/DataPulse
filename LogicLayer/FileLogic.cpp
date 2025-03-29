@@ -80,43 +80,121 @@ void FileLogic::write_local_data(FileModel* fileModel){
     fileModel->clear_buffer();
 }
 
-void FileLogic::read_remote_data(FileModel* fileModel, SftpSessionModel *sftpSessionModel, size_t chunk_size){
+// void FileLogic::read_remote_data(FileModel* fileModel, SftpSessionModel *sftpSessionModel, size_t chunk_size){
     
+//     if (fileModel->get_fully_read()) 
+//         throw runtime_error("Attempting to read a fully read file: " + fileModel->get_relative_path());
+
+//     sftp_session sftp = sftpSessionModel->get();
+//     // string file_name = fileModel->get_remote_path() + "/" + fileModel->get_relative_path(); 
+//     string file_name = fileModel->get_remote_file_path();
+//     int access_type = O_RDONLY;
+
+//     sftp_file file = sftp_open(sftp, file_name.c_str(), access_type, 0);
+//     if (!file){
+//         fileModel->set_read_perm(false);
+//         // sftp_close(file); //TODO TESTING MEMORY LEAK 1
+//         cout << "No read perms on remote: " + file_name << endl;
+//         return;
+//     }
+//     fileModel->set_read_perm(true);
+
+//     try{
+//         size_t size = this->_get_remote_size(sftpSessionModel, file_name);
+//         if (size != fileModel->get_size()) 
+//             fileModel->set_size(size);
+    
+//         size_t curr_bytes = fileModel->get_bytes_read();
+//         if (chunk_size > size-curr_bytes) chunk_size = size-curr_bytes;
+        
+//         vector<byte> buffer(chunk_size);
+    
+//         if (sftp_seek64(file, static_cast<uint64_t>(curr_bytes)) < 0) {
+//             sftp_close(file);
+//             throw runtime_error("Failed to seek to remote position " + to_string(curr_bytes) + " in file: " + file_name);
+//         }
+    
+//         int bytes_read = sftp_read(file, reinterpret_cast<char*>(buffer.data()), chunk_size);
+    
+//         // if(!bytes_read) cout << "Read nothing from remote file: " + file_name  << endl;
+    
+//         fileModel->increase_bytes_read(bytes_read);
+
+//         sftp_close(file);
+        
+//         this->_update_model_with_data(fileModel, buffer);
+//     }
+//     catch (...) {
+
+//         sftp_close(file);
+//         throw;
+//     }
+
+// }
+
+
+//TODO TESTING MEMORY LEAK 5
+void FileLogic::read_remote_data(FileModel* fileModel, SftpSessionModel *sftpSessionModel, size_t chunk_size) {
     if (fileModel->get_fully_read()) 
         throw runtime_error("Attempting to read a fully read file: " + fileModel->get_relative_path());
 
     sftp_session sftp = sftpSessionModel->get();
-    // string file_name = fileModel->get_remote_path() + "/" + fileModel->get_relative_path(); 
     string file_name = fileModel->get_remote_file_path();
     int access_type = O_RDONLY;
 
     sftp_file file = sftp_open(sftp, file_name.c_str(), access_type, 0);
-    if (!file){
+    if (!file) {
         fileModel->set_read_perm(false);
         cout << "No read perms on remote: " + file_name << endl;
         return;
     }
-    fileModel->set_read_perm(true);
-    size_t size = this->_get_remote_size(sftpSessionModel, file_name);
-    if (size != fileModel->get_size()) 
-        fileModel->set_size(size);
-
-    size_t curr_bytes = fileModel->get_bytes_read();
-    if (chunk_size > size-curr_bytes) chunk_size = size-curr_bytes;
     
-    vector<byte> buffer(chunk_size);
+    fileModel->set_read_perm(true);
+    
+    // Declare buffer outside the try block so it's accessible in the catch
+    vector<byte> buffer;
+    
+    try {
+        size_t size = this->_get_remote_size(sftpSessionModel, file_name);
+        if (size != fileModel->get_size()) 
+            fileModel->set_size(size);
 
-    if (sftp_seek64(file, static_cast<uint64_t>(curr_bytes)) < 0) {
+        size_t curr_bytes = fileModel->get_bytes_read();
+        if (chunk_size > size-curr_bytes) chunk_size = size-curr_bytes;
+        
+        buffer.resize(chunk_size);
+
+        if (sftp_seek64(file, static_cast<uint64_t>(curr_bytes)) < 0) {
+            // Don't throw here to avoid the double-free risk, just return
+            fileModel->set_read_perm(false);
+            sftp_close(file);
+            return;
+        }
+
+        int bytes_read = sftp_read(file, reinterpret_cast<char*>(buffer.data()), chunk_size);
+        if (bytes_read < 0) {
+            // Handle read error without throwing to avoid double-free
+            fileModel->set_read_perm(false);
+            sftp_close(file);
+            return;
+        }
+        
+        fileModel->increase_bytes_read(bytes_read);
+        
+        // Close the file handle here (only once)
         sftp_close(file);
-        throw runtime_error("Failed to seek to remote position " + to_string(curr_bytes) + " in file: " + file_name);
+        file = nullptr; // Mark as closed to prevent double-free in catch block
+        
+        // Now that we've closed the file, update the model
+        this->_update_model_with_data(fileModel, buffer);
+    } 
+    catch (const std::exception& e) {
+        // If file is still open, close it
+        if (file) {
+            sftp_close(file);
+        }
+        throw;
     }
-
-    int bytes_read = sftp_read(file, reinterpret_cast<char*>(buffer.data()), chunk_size);
-
-    // if(!bytes_read) cout << "Read nothing from remote file: " + file_name  << endl;
-
-    fileModel->increase_bytes_read(bytes_read);
-    this->_update_model_with_data(fileModel, buffer);
 }
 
 void FileLogic::write_remote_data(FileModel* fileModel, SftpSessionModel *sftpSessionModel) {

@@ -126,7 +126,59 @@ string DataLogic::compute_md5_local(const string& file_path) {
 }
 
 
-string DataLogic::compute_md5_remote(SftpSessionModel *sftpSessionModel, const string& remote_path) {
+// string DataLogic::compute_md5_remote(SftpSessionModel *sftpSessionModel, const string& remote_path) {
+//     sftp_session sftp = sftpSessionModel->get();
+//     sftp_file file = sftp_open(sftp, remote_path.c_str(), O_RDONLY, 0);
+//     if (!file) {
+//         throw runtime_error("Cannot open remote file: " + remote_path);
+//     }
+    
+//     EVP_MD_CTX *mdctx = EVP_MD_CTX_new();
+//     if (!mdctx) {
+//         sftp_close(file);
+//         throw runtime_error("EVP_MD_CTX_new failed");
+//     }
+//     if (1 != EVP_DigestInit_ex(mdctx, EVP_md5(), nullptr)) {
+//         EVP_MD_CTX_free(mdctx);
+//         sftp_close(file);
+//         throw runtime_error("EVP_DigestInit_ex failed");
+//     }
+    
+//     const size_t buffer_size = 8192;
+//     vector<char> buffer(buffer_size);
+//     int bytes_read;
+//     while ((bytes_read = sftp_read(file, buffer.data(), buffer.size())) > 0) {
+//         if (1 != EVP_DigestUpdate(mdctx, buffer.data(), bytes_read)) {
+//             EVP_MD_CTX_free(mdctx);
+//             sftp_close(file);
+//             throw runtime_error("EVP_DigestUpdate failed");
+//         }
+//     }
+//     if (bytes_read < 0) {
+//         EVP_MD_CTX_free(mdctx);
+//         sftp_close(file);
+//         throw runtime_error("Error reading remote file: " + remote_path);
+//     }
+    
+//     sftp_close(file);
+//     unsigned char digest[EVP_MAX_MD_SIZE];
+//     unsigned int digest_len = 0;
+//     if (1 != EVP_DigestFinal_ex(mdctx, digest, &digest_len)) {
+//         EVP_MD_CTX_free(mdctx);
+//         sftp_close(file);
+//         throw runtime_error("EVP_DigestFinal_ex failed");
+//     }
+//     EVP_MD_CTX_free(mdctx);
+//     sftp_close(file);
+
+//     stringstream ss;
+//     for (unsigned int i = 0; i < digest_len; ++i) {
+//         ss << hex << setw(2) << setfill('0') << (int)digest[i];
+//     }
+//     return ss.str();
+// }
+
+string DataLogic::compute_md5_remote(SftpSessionModel *sftpSessionModel, const string& remote_path) { //TODO TESTING MEMORY LEAK 6
     sftp_session sftp = sftpSessionModel->get();
     sftp_file file = sftp_open(sftp, remote_path.c_str(), O_RDONLY, 0);
     if (!file) {
@@ -138,6 +190,7 @@ string DataLogic::compute_md5_remote(SftpSessionModel *sftpSessionModel, const s
         sftp_close(file);
         throw runtime_error("EVP_MD_CTX_new failed");
     }
+
     if (1 != EVP_DigestInit_ex(mdctx, EVP_md5(), nullptr)) {
         EVP_MD_CTX_free(mdctx);
         sftp_close(file);
@@ -147,35 +200,41 @@ string DataLogic::compute_md5_remote(SftpSessionModel *sftpSessionModel, const s
     const size_t buffer_size = 8192;
     vector<char> buffer(buffer_size);
     int bytes_read;
-    while ((bytes_read = sftp_read(file, buffer.data(), buffer.size())) > 0) {
-        if (1 != EVP_DigestUpdate(mdctx, buffer.data(), bytes_read)) {
-            EVP_MD_CTX_free(mdctx);
-            sftp_close(file);
-            throw runtime_error("EVP_DigestUpdate failed");
+    
+    try {
+        while ((bytes_read = sftp_read(file, buffer.data(), buffer.size())) > 0) {
+            if (1 != EVP_DigestUpdate(mdctx, buffer.data(), bytes_read)) {
+                throw runtime_error("EVP_DigestUpdate failed");
+            }
         }
-    }
-    if (bytes_read < 0) {
+        
+        if (bytes_read < 0) {
+            throw runtime_error("Error reading remote file: " + remote_path);
+        }
+        
+        unsigned char digest[EVP_MAX_MD_SIZE];
+        unsigned int digest_len = 0;
+        if (1 != EVP_DigestFinal_ex(mdctx, digest, &digest_len)) {
+            throw runtime_error("EVP_DigestFinal_ex failed");
+        }
+        
+        stringstream ss;
+        for (unsigned int i = 0; i < digest_len; ++i) {
+            ss << hex << setw(2) << setfill('0') << (int)digest[i];
+        }
+        
+        // Cleanup resources properly
         EVP_MD_CTX_free(mdctx);
         sftp_close(file);
-        throw runtime_error("Error reading remote file: " + remote_path);
-    }
-    
-    sftp_close(file);
-    unsigned char digest[EVP_MAX_MD_SIZE];
-    unsigned int digest_len = 0;
-    if (1 != EVP_DigestFinal_ex(mdctx, digest, &digest_len)) {
+        
+        return ss.str();
+    } catch (const exception& e) {
+        // Clean up resources in case of exceptions
         EVP_MD_CTX_free(mdctx);
-        throw runtime_error("EVP_DigestFinal_ex failed");
+        sftp_close(file);
+        throw;
     }
-    EVP_MD_CTX_free(mdctx);
-
-    stringstream ss;
-    for (unsigned int i = 0; i < digest_len; ++i) {
-        ss << hex << setw(2) << setfill('0') << (int)digest[i];
-    }
-    return ss.str();
 }
-
 
 //================================================================//
 //=============== PUBLIC READING & WRITING METHODS ===============//
@@ -184,29 +243,40 @@ string DataLogic::compute_md5_remote(SftpSessionModel *sftpSessionModel, const s
 DataModel *DataLogic::collect_files(CommandModel *commandModel, bool print_model){ 
     vector<FileModel*> *local_files = this->collect_local_files(commandModel);
     vector<FileModel*> *remote_files = this->collect_remote_files(commandModel);
+    DataModel *dataModel = nullptr;
 
-    // Throw messages to main to print more info for user
-    if (local_files == nullptr && remote_files == nullptr) throw runtime_error("!Error: Failed reading both local and remote files.");
-    if (local_files == nullptr) throw runtime_error("!Error: Failed reading local files.");
-    if (remote_files == nullptr) throw runtime_error("!Error: Failed reading remote files.");
+    try{
+        if (local_files == nullptr && remote_files == nullptr) throw runtime_error("!Error: Failed reading both local and remote files.");
+        if (local_files == nullptr) throw runtime_error("!Error: Failed reading local files.");
+        if (remote_files == nullptr) throw runtime_error("!Error: Failed reading remote files.");
+    
+        DataModel *dataModel = new DataModel();
+        
+        // cout << "Populating local files to DataModel" << endl;
+        dataModel->add_local_files(local_files);
+        // cout << "Populating remote files to DataModel" << endl;
+        dataModel->add_remote_files(remote_files);
+        
+        // cout << "Mark syncable files to DataModel" << endl;
+        dataModel = this->mark_syncable_files(dataModel, commandModel);
+        
+        if(print_model){
+            //--- Printing Data Model Pretty! ---//
+            cout << *dataModel << endl;
+        }
+        delete local_files;
+        delete remote_files;
+        
+        
+        return dataModel;
 
-    DataModel *dataModel = new DataModel();
-    
-    // cout << "Populating local files to DataModel" << endl;
-    dataModel->add_local_files(local_files);
-    // cout << "Populating remote files to DataModel" << endl;
-    dataModel->add_remote_files(remote_files);
-    
-    // cout << "Mark syncable files to DataModel" << endl;
-    dataModel = this->mark_syncable_files(dataModel, commandModel);
-    
-    if(print_model){
-        //--- Printing Data Model Pretty! ---//
-        cout << *dataModel << endl;
+
+    } catch (...) {
+        if (local_files) delete local_files;
+        if (remote_files) delete remote_files;
+        if (dataModel) delete dataModel;
+        throw; // Re-throw the exception after cleanup
     }
-    
-    // cout << "Return DataModel" << endl;
-    return dataModel;
 }
 
 
