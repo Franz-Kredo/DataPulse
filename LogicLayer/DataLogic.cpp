@@ -22,8 +22,6 @@ bool DataLogic::compare_synced_data(DataModel *dataModel, CommandModel *commandM
         cout << "File MD5 Checksum:" << endl;
     }
 
-    // unordered_map<string, string>
-
     std::set<string> file_set;
     for (const auto &pair : local_files) {
         const string &relative_path = pair.first;
@@ -47,7 +45,6 @@ bool DataLogic::compare_synced_data(DataModel *dataModel, CommandModel *commandM
         else if(remote_file_model == remote_files.end()) {
             cout << "Some sync issue with: " << relative_path << endl;
             all_good = false;
-            // local_file->set_can_sync(true);
         }
 
 
@@ -126,59 +123,7 @@ string DataLogic::compute_md5_local(const string& file_path) {
 }
 
 
-// string DataLogic::compute_md5_remote(SftpSessionModel *sftpSessionModel, const string& remote_path) {
-//     sftp_session sftp = sftpSessionModel->get();
-//     sftp_file file = sftp_open(sftp, remote_path.c_str(), O_RDONLY, 0);
-//     if (!file) {
-//         throw runtime_error("Cannot open remote file: " + remote_path);
-//     }
-    
-//     EVP_MD_CTX *mdctx = EVP_MD_CTX_new();
-//     if (!mdctx) {
-//         sftp_close(file);
-//         throw runtime_error("EVP_MD_CTX_new failed");
-//     }
-//     if (1 != EVP_DigestInit_ex(mdctx, EVP_md5(), nullptr)) {
-//         EVP_MD_CTX_free(mdctx);
-//         sftp_close(file);
-//         throw runtime_error("EVP_DigestInit_ex failed");
-//     }
-    
-//     const size_t buffer_size = 8192;
-//     vector<char> buffer(buffer_size);
-//     int bytes_read;
-//     while ((bytes_read = sftp_read(file, buffer.data(), buffer.size())) > 0) {
-//         if (1 != EVP_DigestUpdate(mdctx, buffer.data(), bytes_read)) {
-//             EVP_MD_CTX_free(mdctx);
-//             sftp_close(file);
-//             throw runtime_error("EVP_DigestUpdate failed");
-//         }
-//     }
-//     if (bytes_read < 0) {
-//         EVP_MD_CTX_free(mdctx);
-//         sftp_close(file);
-//         throw runtime_error("Error reading remote file: " + remote_path);
-//     }
-    
-//     sftp_close(file);
-//     unsigned char digest[EVP_MAX_MD_SIZE];
-//     unsigned int digest_len = 0;
-//     if (1 != EVP_DigestFinal_ex(mdctx, digest, &digest_len)) {
-//         EVP_MD_CTX_free(mdctx);
-//         sftp_close(file);
-//         throw runtime_error("EVP_DigestFinal_ex failed");
-//     }
-//     EVP_MD_CTX_free(mdctx);
-//     sftp_close(file);
-
-//     stringstream ss;
-//     for (unsigned int i = 0; i < digest_len; ++i) {
-//         ss << hex << setw(2) << setfill('0') << (int)digest[i];
-//     }
-//     return ss.str();
-// }
-
-string DataLogic::compute_md5_remote(SftpSessionModel *sftpSessionModel, const string& remote_path) { //TODO TESTING MEMORY LEAK 6
+string DataLogic::compute_md5_remote(SftpSessionModel *sftpSessionModel, const string& remote_path) { 
     sftp_session sftp = sftpSessionModel->get();
     sftp_file file = sftp_open(sftp, remote_path.c_str(), O_RDONLY, 0);
     if (!file) {
@@ -223,18 +168,19 @@ string DataLogic::compute_md5_remote(SftpSessionModel *sftpSessionModel, const s
             ss << hex << setw(2) << setfill('0') << (int)digest[i];
         }
         
-        // Cleanup resources properly
+        // Cleanup 
         EVP_MD_CTX_free(mdctx);
         sftp_close(file);
         
         return ss.str();
     } catch (const exception& e) {
-        // Clean up resources in case of exceptions
+        // Cleanup
         EVP_MD_CTX_free(mdctx);
         sftp_close(file);
         throw;
     }
 }
+
 
 //================================================================//
 //=============== PUBLIC READING & WRITING METHODS ===============//
@@ -252,12 +198,9 @@ DataModel *DataLogic::collect_files(CommandModel *commandModel, bool print_model
     
         DataModel *dataModel = new DataModel();
         
-        // cout << "Populating local files to DataModel" << endl;
         dataModel->add_local_files(local_files);
-        // cout << "Populating remote files to DataModel" << endl;
         dataModel->add_remote_files(remote_files);
         
-        // cout << "Mark syncable files to DataModel" << endl;
         dataModel = this->mark_syncable_files(dataModel, commandModel);
         
         if(print_model){
@@ -403,25 +346,17 @@ DataModel *DataLogic::write_remote(DataModel *dataModel, CommandModel *commandMo
 
 vector<FileModel*> *DataLogic::collect_local_files(CommandModel *commandModel){
     vector<FileModel*> *all_file_models = new vector<FileModel*>();;
-    // cout << "\n\n-=-=-=-=-= DataLogic::get_all_local_files -=-=-=-=-=" << endl;
 
     string local_path = commandModel->get_local_dir_path();
-    // for (const auto & entry : filesystem::directory_iterator(local_path)){
-    // cout << "before collecting local files... " << endl;
     for (const auto &entry : filesystem::recursive_directory_iterator(local_path)) {
         if (!filesystem::is_regular_file(entry))
-            continue; // Skip directories or other non-file entries
+            continue; // Skip dirs
 
         string relative_path = filesystem::relative(entry.path(), local_path).string();
-
-        // cout << "local: relative_path => " << relative_path << endl;
-
         FileModel *fileModel = FileModel::populate_local_file_model(commandModel, relative_path);
-        // cout << relative_path << endl; 
 
         all_file_models->push_back(fileModel);
     }
-    // cout << "after collecting local files... " << endl;
 
     return all_file_models;
 }
@@ -429,7 +364,6 @@ vector<FileModel*> *DataLogic::collect_local_files(CommandModel *commandModel){
 
 vector<FileModel*> *DataLogic::collect_remote_files(CommandModel *commandModel){
     vector<FileModel*> *all_file_models = new vector<FileModel*>();
-    // cout << "\n\n-=-=-=-=-= DataLogic::get_all_remote_files -=-=-=-=-=" << endl;
 
     string remote_base = commandModel->get_remote_dir_path();
     // Start the recursive traversal from the base remote directory.
@@ -437,6 +371,7 @@ vector<FileModel*> *DataLogic::collect_remote_files(CommandModel *commandModel){
 
     return all_file_models;
 }
+
 
 // Helper function for recursive remote file collection.
 void DataLogic::collect_remote_files_recursive(sftp_session sftp, const string &base_path, const string &current_path, CommandModel *commandModel, vector<FileModel*> &files) {
@@ -466,8 +401,6 @@ void DataLogic::collect_remote_files_recursive(sftp_session sftp, const string &
             string relative_path = full_path.substr(base_path.size());
             if (!relative_path.empty() && relative_path[0] == '/')
                 relative_path = relative_path.substr(1);
-
-            // cout << "remote: relative_path => " << relative_path << endl;
             
             FileModel *fileModel = FileModel::populate_remote_file_model(commandModel, relative_path, attrs->size);
             files.push_back(fileModel);

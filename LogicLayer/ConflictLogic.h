@@ -21,7 +21,7 @@ class ConflictLogic {
 public:
     ConflictLogic(FileLogic *fileLogic, NetworkLogic *networkLogic, DataLogic *dataLogic);
     string conflict_handler(int option, DataModel *dataModel, FileModel *local_file, FileModel *remote_file); 
-    //void mark_conlicting_files(DataModel *dataModel);
+
     vector<FileModel*> mark_conlicting_files(DataModel *dataModel);
     
     void overide_with_newer_file(DataModel *datamodel, FileModel *local_file, FileModel *remote_filel);

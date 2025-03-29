@@ -44,7 +44,6 @@ private:
      */
     string prompt_hidden(string const &prompt);
 
-    string get_key_pass(ssh_session sshSession, string passphrase);
 
     SftpSessionModel *generate_sftp_session(CommandModel *commandModel);
 };

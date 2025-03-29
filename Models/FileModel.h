@@ -35,7 +35,6 @@ class FileModel {
 	bool has_conflict = false;
 
 public:
-	//FileModel() = default;
 	FileModel(const string& path, const std::string& relative_file_path, std::size_t size);
     	~FileModel() = default;
 
@@ -43,7 +42,7 @@ public:
 	string get_relative_path() const {return this->relative_file_path;}
 	string get_path() const {return this->path;}	
 	string get_remote_path() const {return this->remote_path;}	
-	// string get_name() const {return this->name;}	
+
 	string get_name() const {return filesystem::path(this->relative_file_path).filename().string();} // Collect the name using the relative path
     
 	size_t get_size() const {return this->size;}	
@@ -61,7 +60,6 @@ public:
 
 	void set_path(string path) { this->path = path;}	
 	void set_remote_dir_path(string path) { this->remote_path = path;}	
-	// void set_name(string name)  { this->name = name;}	
     
     // New set_name() method that replaces the file name portion in relative_file_path
     void set_name(const string& new_name) {

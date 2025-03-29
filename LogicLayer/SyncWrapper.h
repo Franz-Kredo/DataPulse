@@ -28,10 +28,6 @@ public:
     SyncWrapper(CommandModel *commandModel);
 
     ~SyncWrapper() {
-        // delete fileLogic;
-        // delete networkLogic;
-        // delete dataLogic;
-        // delete conflictLogic;
         if (networkLogic) {
             delete networkLogic;
             networkLogic = nullptr;
@@ -77,7 +73,6 @@ public:
     bool verify_sync(DataModel *oldDataModel);
     
     DataModel *initialize_files();
-    // string sync_with_remote(DataModel *dataModel);
 };
 
 #endif // SYNCWRAPPER_H

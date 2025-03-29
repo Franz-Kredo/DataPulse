@@ -3,17 +3,6 @@
 #include "ConflictLogic.h"
 
 
-// SyncWrapper::SyncWrapper(CommandModel *commandModel){
-//     this->commandModel = commandModel;
-//     this->fileLogic = new FileLogic();
-    
-//     try{ this->networkLogic = new NetworkLogic(commandModel); }
-//     catch (...) { cout << "An error occurred while creating networkLogic." << endl; } 
-
-
-//     this->dataLogic = new DataLogic(this->fileLogic, this->networkLogic);
-//     this->conflictLogic = new ConflictLogic(this->fileLogic, this->networkLogic, this->dataLogic);
-// }
 SyncWrapper::SyncWrapper(CommandModel *commandModel) {
     this->commandModel = commandModel;
     this->fileLogic = new FileLogic();
@@ -49,21 +38,17 @@ SyncWrapper::SyncWrapper(CommandModel *commandModel) {
 }
 
 
-
 DataModel *SyncWrapper::initialize_files(){
         // Collect data locally and remotely
         return this->dataLogic->collect_files(this->commandModel);
 }
+
 
 string SyncWrapper::sync_with_remote(DataModel *dataModel){
     try {
         // Write the syncable data to local and remote
         this->dataLogic->write_data(dataModel, commandModel);
         
-
-        // dataModel = dataModel;
-
-        // IOHandler::wait(3);
         bool sync_completed = this->verify_sync(dataModel);
         if(sync_completed) 
             return "Sync concluded!";
@@ -87,6 +72,7 @@ string SyncWrapper::sync_with_remote(DataModel *dataModel){
 
     return "Sync unsuccessful...";
 }
+
 
 bool SyncWrapper::verify_sync(DataModel *oldDataModel){
     // Collect data locally and remotely

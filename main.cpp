@@ -43,14 +43,10 @@ void conflict_resolver(SyncWrapper *syncWrapper, DataModel *dataModel){
         
         catch(...){
             cout << "We fucked up in syncWrapper->conflictLogic->conflict_handler(opt, dataModel, local_file, remote_file);..." << endl;
-        }
-        
-
-        
+        }        
     }
     
 }
-
 
 
 int main(int argc, const char * argv[]) {
@@ -121,5 +117,3 @@ int main(int argc, const char * argv[]) {
 
     return 0;
 }
-
-

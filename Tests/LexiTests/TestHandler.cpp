@@ -5,6 +5,8 @@
 #include "../../Models/SftpSessionModel.h"
 #include "../../LogicLayer/NetworkLogic.h"
 const string TEST_PATH = "Tests/LexiTests";
+
+
 void TestHandler::test_local_file_ops(){
 	string path = filesystem::current_path();
 	    path+="/";
@@ -17,10 +19,8 @@ void TestHandler::test_local_file_ops(){
     	FileLogic logic;
     	
     	try {
-    	    	logic.read_local_data(&fileModel, 160); // Read 16 bytes
-    	    	logic.write_local_data(&fileModel);    // Write buffer to "test_write_to.txt"
-    	    	//logic.read_local_data(&fileModel, 8); // Read 16 bytes
-    	    	//logic.write_local_data(&fileModel);    // Write buffer to "test_write_to.txt"
+    	    	logic.read_local_data(&fileModel, 160); 
+    	    	logic.write_local_data(&fileModel);    
     	    	cout << "Read and write completed successfully, catting outp" << endl;
     	} catch (const exception& ex) {
     	    	cerr << "Exception: " << ex.what() << endl;
@@ -34,6 +34,7 @@ void TestHandler::test_local_file_ops(){
 
     	    file.close();
 }
+
 
 void TestHandler::test_remote_file_read(SftpSessionModel *sftpSessionModel, CommandModel *commandModel) {
     string remote_path = commandModel->get_remote_dir_path();
@@ -54,20 +55,21 @@ void TestHandler::test_remote_file_read(SftpSessionModel *sftpSessionModel, Comm
     FileLogic logic;
 
     try {
-        logic.read_remote_data(&fileModel, sftpSessionModel, 64); // Read 32 bytes
-    	logic.write_local_data(&fileModel);    // Write buffer to "test_write_to.txt"
+        logic.read_remote_data(&fileModel, sftpSessionModel, 64); 
+    	logic.write_local_data(&fileModel);    
         cout << "Remote read succeeded. Dumping buffer contents:" << endl;
 
         const vector<byte>& buffer = fileModel.get_buffer();
         for (byte b : buffer) cout << static_cast<char>(b);
         cout << endl;
-        logic.read_remote_data(&fileModel, sftpSessionModel, 64); // Read 32 bytes
-    	logic.write_local_data(&fileModel);    // Write buffer to "test_write_to.txt"
+        logic.read_remote_data(&fileModel, sftpSessionModel, 64); 
+    	logic.write_local_data(&fileModel);    
 
     } catch (const exception& ex) {
         cerr << "Exception during remote read: " << ex.what() << endl;
     }
 }
+
 
 void TestHandler::test_remote_file_write(SftpSessionModel* sftpSessionModel, CommandModel* commandModel) {
     string local_path = "/home/lexman/ru_s25/forc/DataPulse/Tests/LexiTests";
@@ -77,16 +79,15 @@ void TestHandler::test_remote_file_write(SftpSessionModel* sftpSessionModel, Com
     size_t test_size = filesystem::file_size(local_path + "/" + local_filename);
     FileModel fileModel(local_path, local_filename, test_size);
     fileModel.set_remote_dir_path(remote_path);
-    fileModel.set_name(remote_filename); // we're writing under a different name on remote
+    fileModel.set_name(remote_filename); 
     FileLogic logic;
     try {
-        logic.read_local_data(&fileModel, 150); // Read from local
-        logic.write_remote_data(&fileModel, sftpSessionModel); // Write to remote
+        logic.read_local_data(&fileModel, 150); 
+        logic.write_remote_data(&fileModel, sftpSessionModel); 
         cout << "Write to remote succeeded. Verifying contents..." << endl;
-        // Re-read remote to confirm write
+
 	fileModel.set_fully_read(false);
-        //logic.read_local_data(&fileModel, 16);
-        logic.write_remote_data(&fileModel, sftpSessionModel); // Write to remote
+        logic.write_remote_data(&fileModel, sftpSessionModel); 
         const vector<byte>& buffer = fileModel.get_buffer();
         for (byte b : buffer) cout << static_cast<char>(b);
         cout << endl;
@@ -94,6 +95,7 @@ void TestHandler::test_remote_file_write(SftpSessionModel* sftpSessionModel, Com
         cerr << "Exception during remote write test: " << ex.what() << endl;
     }
 }
+
 
 void TestHandler::test_network_connection(){
     CommandModel command;
@@ -107,12 +109,11 @@ void TestHandler::test_network_connection(){
         NetworkLogic *netLogic = new NetworkLogic(&command);
 	
 	SftpSessionModel *sftpSessionModel = netLogic->sftpSession;
-	//this->test_remote_file_read(sftpSessionModel, &command);
+
 	this->test_remote_file_write(sftpSessionModel, &command);
-        //netLogic.list_remote_directory(&command);
+
     } catch (const exception &e) {
         cerr << "Exception: " << e.what() << endl;
     }
 }
-
 

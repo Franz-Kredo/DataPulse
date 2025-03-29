@@ -2,7 +2,6 @@
 #include "SftpSessionModel.h"
 
 
-
 // Constructor
 SftpSessionModel::SftpSessionModel(ssh_session ssh)
     : ssh_sesh(ssh), sftp_sesh(nullptr)
@@ -15,7 +14,6 @@ SftpSessionModel::SftpSessionModel(ssh_session ssh)
     if (sftp_init(sftp_sesh) != SSH_OK)
         throw std::runtime_error("SFTP initialization failed: " + std::string(ssh_get_error(ssh_sesh)));
 }
-
 
 // Decosntructor
 SftpSessionModel::~SftpSessionModel() {
