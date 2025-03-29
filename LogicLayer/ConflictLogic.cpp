@@ -36,7 +36,12 @@ string ConflictLogic::conflict_handler(int option, DataModel *dataModel, FileMod
 } 
 
 vector<FileModel*> ConflictLogic::mark_conlicting_files(DataModel *dataModel){
+<<<<<<< Updated upstream
     cout << "Conflict check was called" << endl;
+=======
+    cout << "Conlict marked" << endl;
+    // cout << "Conflict check was called" << endl;
+>>>>>>> Stashed changes
     unordered_map<string, FileModel*>&  local_files = dataModel->get_local_files();
     unordered_map<string, FileModel*>&  remote_files = dataModel->get_remote_files();
     bool conflict;
@@ -93,49 +98,78 @@ void ConflictLogic::keep_both_files_auto_rename(DataModel *dataModel, FileModel 
 
     // string remote_file_path = remote_file->get_remote_path() + "/" + remote_file->get_name();
     string remote_file_path = remote_file->get_remote_file_path();
-    string new_remote_name = remote_file->get_relative_path() + "_r";
-    while (local_files.count(new_remote_name) != 0 && remote_files.count(new_remote_name) != 0)
+    string pure_remote_name = remote_file->get_name() + "_r";
+    string new_remote_name = remote_file_path + "_r";
+    while (local_files.count(new_remote_name) != 0 && remote_files.count(new_remote_name) != 0){
         new_remote_name +="_r";
+        pure_remote_name +="_r";
+    }
         
-    remote_file->set_name(new_remote_name);
+    //remote_file->set_name(new_remote_name);
     // string new_remote_file_path = remote_file->get_remote_path() + "/" + new_remote_name;
-    string new_remote_file_path = remote_file->get_remote_file_path();
+   // string new_remote_file_path = remote_file->get_remote_file_path();
 
     // string local_file_path = local_file->get_path() + "/" + local_file->get_name();
     string local_file_path = local_file->get_local_file_path();
-    string new_local_name = local_file->get_relative_path() + "_l";
-    while (local_files.count(new_local_name) != 0 && remote_files.count(new_local_name) != 0)
+    string pure_local_name = local_file->get_name() + "_l";
+    string new_local_name = local_file_path + "_l";
+    while (local_files.count(new_local_name) != 0 && remote_files.count(new_local_name) != 0){
         new_local_name +="_l";
+        pure_local_name += "_l";
+    }
 
-    local_file->set_name(new_local_name);
+    //local_file->set_name(new_local_name);
     // string new_local_file_path = local_file->get_path() + "/" + new_local_name;
+<<<<<<< Updated upstream
     string new_local_file_path = local_file->get_local_file_path();
     cout << "Local rmote path: " << remote_file_path << endl;
     cout << "New rmote file: " << new_remote_file_path << endl;
+=======
+    //string new_local_file_path = local_file->get_local_file_path();
+    cout << "REMOTE FILES:" << endl;
+    cout << remote_file_path << endl;
+    cout << new_remote_name << endl;
+>>>>>>> Stashed changes
 
-    int rc = sftp_rename(sftpSessionModel->get(), remote_file_path.c_str(), new_remote_file_path.c_str());
+    int rc = sftp_rename(sftpSessionModel->get(), remote_file_path.c_str(), new_remote_name.c_str());
     if (rc < 0) 
         throw std::runtime_error("Failed to rename remote file.");
+    cout << "LOCAL FILES:" << endl;
+    cout << local_file_path << endl;
+    cout << new_local_name << endl;
 
+<<<<<<< Updated upstream
     cout << "Local file path: " << local_file_path << endl;
     cout << "New local file: " << new_local_file_path << endl;
+=======
+    std::filesystem::rename(local_file_path, new_local_name);
+>>>>>>> Stashed changes
 
-    std::filesystem::rename(local_file_path, new_local_file_path);
-
+    cout << "Pure names" << endl;
+    cout << pure_local_name << endl;
+    cout << pure_remote_name << endl;
    
-    local_file->set_name(new_local_name);
+    local_file->set_name(pure_local_name);
     local_file->set_can_sync(true);
     local_file->set_conflict_bool(false);
+<<<<<<< Updated upstream
     cout << "Old local key: " << old_local_key << endl;
     cout << "New local key: " << local_file->get_relative_path() << endl;
     this->_update_key_in_datmodel(old_local_key, local_file->get_relative_path(), local_files);
+=======
+    this->_update_key_in_datmodel(old_local_key, pure_local_name, local_files);
+>>>>>>> Stashed changes
     
-    remote_file->set_name(new_remote_name);
+    remote_file->set_name(pure_remote_name);
     remote_file->set_can_sync(true);
     remote_file->set_conflict_bool(false);
+<<<<<<< Updated upstream
     cout << "Old remote key: " << old_remote_key << endl;
     cout << "New remote key: " << remote_file->get_relative_path() << endl;
     this->_update_key_in_datmodel(old_remote_key, remote_file->get_relative_path(), remote_files);
+=======
+    this->_update_key_in_datmodel(old_remote_key, pure_remote_name, remote_files);
+>>>>>>> Stashed changes
 
 
 }

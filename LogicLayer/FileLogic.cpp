@@ -46,7 +46,7 @@ void FileLogic::read_local_data(FileModel* fileModel, size_t chunk_size){
 
 void FileLogic::write_local_data(FileModel* fileModel){
     
-    string file_name = fileModel->get_path() + "/" + fileModel->get_relative_path(); 
+    string file_name = fileModel->get_path() + "/+" + fileModel->get_relative_path(); 
 
     // Create directory if it doesn't exist
     filesystem::path filePath(file_name);
@@ -86,13 +86,13 @@ void FileLogic::read_remote_data(FileModel* fileModel, SftpSessionModel *sftpSes
         throw runtime_error("Attempting to read a fully read file: " + fileModel->get_relative_path());
 
     sftp_session sftp = sftpSessionModel->get();
-    string file_name = fileModel->get_remote_path() + "/" + fileModel->get_relative_path(); 
+    string file_name = fileModel->get_remote_file_path();
     int access_type = O_RDONLY;
 
     sftp_file file = sftp_open(sftp, file_name.c_str(), access_type, 0);
     if (!file){
         fileModel->set_read_perm(false);
-        cout << "No read perms on remote: " + fileModel->get_relative_path() << endl;
+        cout << "No read perms on remote: " + file_name << endl;
         return;
     }
     fileModel->set_read_perm(true);

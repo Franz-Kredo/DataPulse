@@ -1,5 +1,6 @@
 #include "FileModel.h"
 #include <filesystem>
+#include <iterator>
 
 
 FileModel::FileModel(const string& path, const string& relative_file_path, size_t size)
@@ -10,9 +11,13 @@ FileModel::FileModel(const string& path, const string& relative_file_path, size_
 }
 
 string FileModel::get_remote_file_path(){
+<<<<<<< Updated upstream
     // return this->get_remote_path() + "/" + this->get_name();
     cout << "GETTING FULL REMOTE FILE PATH" << endl;
     cout << this->get_remote_path() << "/" << this->get_relative_path() << endl;
+=======
+    cout << "Inside model" << endl;
+>>>>>>> Stashed changes
     return this->get_remote_path() + "/" + this->get_relative_path();
 }
 string FileModel::get_local_file_path(){
