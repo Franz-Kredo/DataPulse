@@ -36,7 +36,7 @@ pair<int, bool> IOHandler::input_conflict_resolution_option() {
     string input;
     regex valid_input_regex("^[1-4]a?$");
     bool has_a = false; 
-    string option_out = "(1)Keep newer/(2)keep older/(3)keep both rename/(4)do not synce/(a) suffix apply to all)";
+    string option_out = "(1)Keep newer/(2)keep older/(3)keep both rename/(4)do not sync/(a) suffix (e.g. 1a, apply to all)";
 
     while (true) {
         cout << option_out << endl;

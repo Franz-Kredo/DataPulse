@@ -2,8 +2,6 @@
 
 #include "UILayer/IOHandler.h"
 #include "LogicLayer/SyncWrapper.h"
-#include "Tests/LexiTests/TestHandler.h"
-
 
 void conflict_resolver(SyncWrapper *syncWrapper, DataModel *dataModel){
     // have this fucker return a vector of conflicting files
