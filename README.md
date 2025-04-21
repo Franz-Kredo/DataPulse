@@ -83,6 +83,6 @@ Add 'a' suffix to any option (e.g., '1a') to apply the same resolution to all re
 - IOHandler: Provides the user interface
 
 ## Authors
-- Franz Ísak Bergmann Ingólfsson
 - Alexander Máni Einarsson
+- Franz Ísak Bergmann Ingólfsson
 - Tómas Orri Kristinsson
